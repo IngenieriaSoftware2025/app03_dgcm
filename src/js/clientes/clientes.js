@@ -23,7 +23,8 @@ const validacionTelefono = () => {
                 icon: "warning",
                 title: "Datos malos",
                 text: "Ingresa exactamente 8 digitos",
-                timer: 2000
+                showConfirmButton: false,
+                timer: 1000
             });
 
             validarTelefono.classList.remove('is-valid');
@@ -66,7 +67,8 @@ const validacionSAR = () => {
             icon: "warning",
             title: "Datos malos",
             text: "SAR invalido",
-            timer: 2000
+            showConfirmButton: false,
+            timer: 1000
         });
     }
 }
@@ -108,7 +110,7 @@ const datosDeTabla = new DataTable('#TableClientes', {
                 <div class='d-flex justify-content-center'>
                     <button class='btn btn-warning modificar mx-1' 
                         data-id="${data}" 
-                        data-nombre="${row.nombres}"  
+                        data-nombres="${row.nombres}"  
                         data-apellidos="${row.apellidos}"
                         data-telefono="${row.telefono}"  
                         data-sar="${row.sar}"   
@@ -137,7 +139,8 @@ const guardaCliente = async (e) => {
             icon: "warning",
             title: "Formulario incompleto",
             text: "Llene todos los campos",
-            timer: 2000
+            showConfirmButton: false,
+            timer: 1000
         });
         BtnGuardar.disabled = false;
     }
@@ -154,28 +157,30 @@ const guardaCliente = async (e) => {
         const respuesta = await fetch(url, config);
         const datos = await respuesta.json();
 
-        const {codigo, mensaje} = datos;
+        const { codigo, mensaje } = datos;
 
         if (codigo === 1) {
             Swal.fire({
-            position: "top-end",
-            icon: "success",
-            title: "Exito",
-            text: mensaje,
-            timer: 2000
-        });
+                position: "center",
+                icon: "success",
+                title: "Exito",
+                text: mensaje,
+                showConfirmButton: false,
+                timer: 1000
+            });
 
-        // limpiarFormulario();
-        // buscaCliente();
+            limpiarFormulario();
+            buscaCliente();
 
         } else {
             Swal.fire({
-            position: "top-end",
-            icon: "info",
-            title: "Error",
-            text: mensaje,
-            timer: 2000
-        });
+                position: "center",
+                icon: "info",
+                title: "Error",
+                text: mensaje,
+                showConfirmButton: false,
+                timer: 1000
+            });
         }
 
     } catch (error) {
@@ -184,11 +189,140 @@ const guardaCliente = async (e) => {
     BtnGuardar.disabled = false;
 }
 
+const buscaCliente = async () => {
+    const url = '/app03_dgcm/busca_cliente';
+    const config = {
+        method: 'GET'
+    }
+
+    try {
+        const respuesta = await fetch(url, config);
+        const datos = await respuesta.json();
+        const { codigo, mensaje, data } = datos;
+
+        if (codigo === 1) {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Exito",
+                text: mensaje,
+                showConfirmButton: false,
+                timer: 1000
+            });
+
+            datosDeTabla.clear().draw();
+            datosDeTabla.rows.add(data).draw();
+
+        } else {
+            Swal.fire({
+                position: "center",
+                icon: "info",
+                title: "Error",
+                text: mensaje,
+                showConfirmButton: false,
+                timer: 1000
+            });
+            return;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const llenarFormulario = (e) => {
+    const datos = e.currentTarget.dataset;
+
+    document.getElementById('id_cliente').value = datos.id;
+    document.getElementById('nombres').value = datos.nombres;
+    document.getElementById('apellidos').value = datos.apellidos;
+    document.getElementById('telefono').value = datos.telefono;
+    document.getElementById('sar').value = datos.sar;
+    document.getElementById('correo').value = datos.correo;
+
+    BtnGuardar.classList.add('d-none');
+    BtnModificar.classList.remove('d-none');
+
+    window.scrollTo({
+        top: 0
+    });
+}
+
+const limpiarFormulario = () => {
+    FormClientes.reset();
+    BtnGuardar.classList.remove('d-none');
+    BtnModificar.classList.add('d-none');
+}
+
+const modificaCliente = async (e) => {
+    e.preventDefault();
+    BtnModificar.disabled = true;
+
+    if (!validarFormulario(FormClientes, [''])) {
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Exito",
+            text: mensaje,
+            showConfirmButton: false,
+            timer: 1000
+        });
+        BtnGuardar.disabled = false;
+    }
+
+    const body = new FormData(FormClientes);
+    const url = '/app03_dgcm/modifica_cliente';
+    const config = {
+        method: 'POST',
+        body
+    }
+
+    try {
+        const respuesta = await fetch(url, config);
+        const datos = await respuesta.json();
+        const { codigo, mensaje } = datos;
+
+        if (codigo === 1) {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Exito",
+                text: mensaje
+            });
+
+            limpiarFormulario();
+            buscaCliente();
+
+        } else {
+            Swal.fire({
+                position: "center",
+                icon: "info",
+                title: "Error",
+                text: mensaje,
+                showConfirmButton: false,
+                timer: 1000
+            });
+            return;
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+    BtnModificar.disabled = false;
+}
+
 // Eventos
+buscaCliente();
 // datosDeTabla.on('click', '.eliminar', eliminarCliente);
-// datosDeTabla.on('click', '.modificar', llenarFormulario);
 validarTelefono.addEventListener('change', validacionTelefono);
 validarSAR.addEventListener('change', validacionSAR);
 
-// GUARDA CLIENTE
-FormClientes.addEventListener('submit', guardaCliente)
+// FormClientes
+FormClientes.addEventListener('submit', guardaCliente);
+
+// Botones
+BtnLimpiar.addEventListener('click', limpiarFormulario);
+BtnModificar.addEventListener('click', modificaCliente);
+
+// datosDeTabla
+datosDeTabla.on('click', '.modificar', llenarFormulario);
