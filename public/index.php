@@ -16,6 +16,7 @@ $router->get('/', [AppController::class,'index']);
 // Get en nuestro idioma significa obtener, osea obtiene la vista de la pagina y la muestra al cliente
 $router->get('/clientes', [ClienteController::class,'mostrarPagina']);
 $router->get('/busca_cliente', [ClienteController::class,'buscaCliente']);
+$router->post('/elimina_cliente', [ClienteController::class,'eliminaCliente']);
 $router->post('/guarda_cliente', [ClienteController::class,'guardarCliente']);
 $router->post('/modifica_cliente', [ClienteController::class,'modificaCliente']);
 

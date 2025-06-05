@@ -7,12 +7,13 @@ namespace Model;
 use Model\ActiveRecord;
 
 // Crea la clase de instancia Clientes y hereda las funciones de ActiveRecord
-class Clientes extends ActiveRecord {
-    
+class Clientes extends ActiveRecord
+{
+
     // Crea las propiedades de la clase
     public static $tabla = 'clientes';
     public static $idTabla = 'id_cliente';
-    public static $columnasDB = 
+    public static $columnasDB =
     [
         'nombres',
         'apellidos',

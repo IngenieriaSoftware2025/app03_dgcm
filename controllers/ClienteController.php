@@ -205,4 +205,27 @@ class ClienteController extends ActiveRecord
             ]);
         }
     }
+
+    public static function eliminaCliente()
+    {
+        getHeadersApi();
+        try {
+            $id = filter_var($_POST['id_cliente'], FILTER_SANITIZE_NUMBER_INT);
+            $consulta = "UPDATE clientes SET situacion = 0 WHERE id_cliente = $id";
+            self::SQL($consulta);
+
+            http_response_code(200);
+            echo json_encode([
+                'codigo' => 1,
+                'mensaje' => 'Exito al eliminar'
+            ]);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al eliminar',
+                'detalle' => $e->getMessage()
+            ]);
+        }
+    }
 }

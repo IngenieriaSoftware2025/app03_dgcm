@@ -311,9 +311,61 @@ const modificaCliente = async (e) => {
     BtnModificar.disabled = false;
 }
 
+const eliminaCliente = async (e) => {
+    const idCliente = e.currentTarget.dataset.id;
+
+    const alertaConfirmaEliminar = await Swal.fire({
+        position: "center",
+        icon: "info",
+        title: "Estas seguro?",
+        text: "Un cliente dejara de existir",
+        showConfirmButton: true,
+        confirmButtonText: "Si",
+        confirmButtonColor: "red",
+        cancelButtonText: "No, cancelar",
+        showCancelButton: true
+    });
+
+    if (alertaConfirmaEliminar.isConfirmed) {
+        const url = `/app03_dgcm/elimina_cliente?id=${idCliente}`;
+        const config = {
+            method: 'POST'
+        }
+        try {
+            const respuesta = await fetch(url, config);
+            const datos = await respuesta.json();
+            const { codigo, mensaje } = datos;
+
+            if (codigo === 1) {
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Exito",
+                    text: mensaje
+                });
+
+                buscaCliente();
+
+            } else {
+                Swal.fire({
+                    position: "center",
+                    icon: "info",
+                    title: "Error",
+                    text: mensaje,
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+                return;
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+
 // Eventos
 buscaCliente();
-// datosDeTabla.on('click', '.eliminar', eliminarCliente);
 validarTelefono.addEventListener('change', validacionTelefono);
 validarSAR.addEventListener('change', validacionSAR);
 
@@ -326,3 +378,4 @@ BtnModificar.addEventListener('click', modificaCliente);
 
 // datosDeTabla
 datosDeTabla.on('click', '.modificar', llenarFormulario);
+datosDeTabla.on('click', '.eliminar', eliminaCliente);
