@@ -12,7 +12,7 @@ class ClienteController extends ActiveRecord
 
     public static function mostrarPagina(Router $router)
     {
-        $router->render('clientes/clientes', []);
+        $router->render('clientes/clientes', [], 'layouts/layout');
     }
 
     public static function guardarCliente()

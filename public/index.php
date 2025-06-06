@@ -8,6 +8,8 @@ use Controllers\AppController;
 // Importa mis clases de Controladores
 use Controllers\ClienteController;
 use Controllers\RolesController;
+use Controllers\LoginController;
+use Controllers\RegistroUsuario;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
@@ -27,6 +29,16 @@ $router->get('/busca_rol', [RolesController::class,'buscaRol']);
 $router->post('/guarda_rol', [RolesController::class,'guardarRol']);
 $router->post('/elimina_rol', [RolesController::class,'eliminarRol']);
 $router->post('/modifica_rol', [RolesController::class,'modificarRol']);
+$router->get('/roles_activos', [RolesController::class,'obtenerRolesActivos']);
+
+// Rutas para Login
+$router->get('/login', [LoginController::class,'mostrarLogin']);
+$router->post('/login', [LoginController::class,'procesarLogin']);
+$router->get('/logout', [LoginController::class,'logout']);
+$router->get('/verificar_sesion', [LoginController::class,'verificarSesion']);
+
+// Rutas para el registro de usuario
+$router->get('/registro', [RegistroUsuario::class,'mostrarPaginaRegistro']);
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();

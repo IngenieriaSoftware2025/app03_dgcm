@@ -10,12 +10,13 @@ class RolesController
 
     public static function mostrarPagina(Router $router)
     {
-        $roles = Roles::all();
+        $roles = Roles::obtenerRolesActivos();
 
-        $router->render('roles/index', [
-            'titulo' => 'Roles',
-            'roles' => $roles
-        ]);
+        $router->render(
+            'roles/index',
+            [],
+            'layouts/layout'
+        );
     }
 
     // Busca un rol 
@@ -119,5 +120,12 @@ class RolesController
                 'alertas' => $rol->getAlertas()
             ]);
         }
+    }
+
+    // Roles activos
+    public static function obtenerRolesActivos(Router $router)
+    {
+        $roles =  Roles::obtenerRolesActivos();
+        echo json_encode($roles);
     }
 }

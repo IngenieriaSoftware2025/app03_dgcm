@@ -47,11 +47,24 @@
                     </div>
 
                 </ul>
-                <div class="col-lg-1 d-grid mb-lg-0 mb-2">
-                    <!-- Ruta relativa desde el archivo donde se incluye menu.php -->
-                    <a href="/menu/" class="btn btn-danger"><i class="bi bi-arrow-bar-left"></i>MENÚ</a>
-                </div>
 
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-1 text-white"></i>Usuario
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" id="dropdownUsuario">
+                        <li>
+                            <a class="dropdown-item" href="/app03_dgcm/login">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/app03_dgcm/registro">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Registrar usuario
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
             </div>
         </div>
