@@ -18,7 +18,6 @@ class ClienteController extends ActiveRecord
     public static function guardarCliente()
     {
         getHeadersApi();
-        echo json_encode($_POST);
 
         // Sanitizar el nombre y validar
         $_POST['nombres'] = ucwords(strtolower(trim(htmlspecialchars($_POST['nombres']))));

@@ -26,11 +26,11 @@
                         <div class="row mb-3 justify-content-center">
                             <div class="col-lg-6">
                                 <label for="telefono" class="form-label">Telefono</label>
-                                <input type="number" class="form-control" id="telefono" name="telefono" placeholder="Ingrese su SAR">
+                                <input type="number" class="form-control" id="telefono" name="telefono" placeholder="Ingrese su numero de telefono">
                             </div>
                             <div class="col-lg-6">
                                 <label for="sar" class="form-label">SAR</label>
-                                <input type="number" class="form-control" id="sar" name="sar" placeholder="Ingrese su numero de telefono">
+                                <input type="number" class="form-control" id="sar" name="sar" placeholder="Ingrese su SAR">
                             </div>
                         </div>
 

@@ -317,52 +317,52 @@ const eliminaCliente = async (e) => {
     const alertaConfirmaEliminar = await Swal.fire({
         position: "center",
         icon: "info",
-        title: "Estas seguro?",
-        text: "Un cliente dejara de existir",
+        title: "¿Estás seguro?",
+        text: "Un cliente dejará de existir",
         showConfirmButton: true,
-        confirmButtonText: "Si",
+        confirmButtonText: "Sí",
         confirmButtonColor: "red",
         cancelButtonText: "No, cancelar",
         showCancelButton: true
     });
 
-    if (alertaConfirmaEliminar.isConfirmed) {
-        const url = `/app03_dgcm/elimina_cliente?id=${idCliente}`;
-        const config = {
-            method: 'POST'
+    if (!alertaConfirmaEliminar.isConfirmed) return;
+
+    const body = new FormData();
+    body.append('id_cliente', idCliente);
+
+    try {
+        const respuesta = await fetch('/app03_dgcm/elimina_cliente', {
+            method: 'POST',
+            body 
+        });
+
+        const datos = await respuesta.json();
+        const { codigo, mensaje, detalle } = datos;
+
+        if (codigo === 1) {
+            await Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Éxito",
+                text: mensaje
+            });
+            buscaCliente();
+        } else {
+            await Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error",
+                text: detalle,
+                showConfirmButton: false,
+                timer: 1000
+            });
         }
-        try {
-            const respuesta = await fetch(url, config);
-            const datos = await respuesta.json();
-            const { codigo, mensaje } = datos;
-
-            if (codigo === 1) {
-                Swal.fire({
-                    position: "center",
-                    icon: "success",
-                    title: "Exito",
-                    text: mensaje
-                });
-
-                buscaCliente();
-
-            } else {
-                Swal.fire({
-                    position: "center",
-                    icon: "info",
-                    title: "Error",
-                    text: mensaje,
-                    showConfirmButton: false,
-                    timer: 1000
-                });
-                return;
-            }
-
-        } catch (error) {
-            console.log(error);
-        }
+    } catch (error) {
+        console.log(error);
     }
-}
+};
+
 
 // Eventos
 buscaCliente();

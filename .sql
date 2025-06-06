@@ -10,3 +10,11 @@ CREATE TABLE clientes
     correo VARCHAR(75),
     situacion SMALLINT DEFAULT 1
 );
+
+CREATE TABLE roles
+(
+    id_rol SERIAL PRIMARY KEY,
+    rol_nombre VARCHAR(50) NOT NULL UNIQUE,
+    situacion SMALLINT DEFAULT 1
+        CHECK (situacion IN (0,1))
+);
