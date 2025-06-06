@@ -39,10 +39,6 @@
                                 <a class="dropdown-item nav-link text-white " href="/app03_dgcm/clientes"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a clientes</a>
                             </li>
 
-                            <li>
-                                <a class="dropdown-item nav-link text-white " href="/app03_dgcm/roles"><i class="ms-lg-0 ms-2 bi bi-shield-check me-2"></i>Gestión de Roles</a>
-                            </li>
-
                         </ul>
                     </div>
 

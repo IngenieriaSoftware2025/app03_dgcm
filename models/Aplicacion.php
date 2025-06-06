@@ -11,7 +11,7 @@ class Aplicacion extends ActiveRecord
 {
     // Crea las propiedades de la clase
     public static $tabla = 'aplicacion';
-    public static $idTabla = 'id_app';
+    public static $idTabla = ['id_app'];
     public static $columnasDB = [
         'nombre_app_lg',
         'nombre_app_md',

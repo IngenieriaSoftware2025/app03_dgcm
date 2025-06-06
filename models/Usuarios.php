@@ -11,7 +11,7 @@ class Usuarios extends ActiveRecord
 {
     // Crea las propiedades de la clase
     public static $tabla = 'usuarios';
-    public static $idTabla = 'id_usuario';
+    public static $idTabla = ['id_usuario'];
     public static $columnasDB = [
         'nombre1',
         'nombre2',
@@ -60,5 +60,22 @@ class Usuarios extends ActiveRecord
         $this->fecha_clave = $usuario['fecha_clave'] ?? null;
         $this->fotografia = $usuario['fotografia'] ?? '';
         $this->situacion = $usuario['situacion'] ?? 1;
+    }
+
+    public function atributos()
+    {
+        $atributos = [];
+        foreach (static::$columnasDB as $columna) {
+            $columna = strtolower($columna);
+
+            // Excluir el ID
+            if ($columna === 'id_usuario') continue;
+
+            // Solo agregar si la propiedad existe y no es null
+            if (property_exists($this, $columna)) {
+                $atributos[$columna] = $this->$columna;
+            }
+        }
+        return $atributos;
     }
 }

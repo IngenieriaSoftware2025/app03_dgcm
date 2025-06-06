@@ -11,7 +11,7 @@ class AsigPermisos extends ActiveRecord
 {
     // Crea las propiedades de la clase
     public static $tabla = 'asig_permisos';
-    public static $idTabla = 'id_asig_permiso';
+    public static $idTabla = ['id_asig_permiso'];
     public static $columnasDB = [
         'id_usuario',
         'id_app',

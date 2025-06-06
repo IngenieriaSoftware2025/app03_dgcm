@@ -12,7 +12,7 @@ class Clientes extends ActiveRecord
 
     // Crea las propiedades de la clase
     public static $tabla = 'clientes';
-    public static $idTabla = 'id_cliente';
+    public static $idTabla = ['id_cliente'];
     public static $columnasDB =
     [
         'nombres',

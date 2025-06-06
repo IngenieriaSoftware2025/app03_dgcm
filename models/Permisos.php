@@ -11,7 +11,7 @@ class Permisos extends ActiveRecord
 {
     // Crea las propiedades de la clase
     public static $tabla = 'permisos';
-    public static $idTabla = 'id_permiso';
+    public static $idTabla = ['id_permiso'];
     public static $columnasDB = [
         'id_app',
         'nombre_permiso',

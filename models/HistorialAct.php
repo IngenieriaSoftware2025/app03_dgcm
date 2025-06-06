@@ -11,7 +11,7 @@ class HistorialAct extends ActiveRecord
 {
     // Crea las propiedades de la clase
     public static $tabla = 'historial_act';
-    public static $idTabla = 'id_hist_act';
+    public static $idTabla = ['id_hist_act'];
     public static $columnasDB = [
         'id_usuario',
         'id_ruta',
