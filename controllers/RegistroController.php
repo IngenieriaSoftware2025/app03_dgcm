@@ -11,7 +11,7 @@ class RegistroController extends ActiveRecord
 {
     public static function mostrarPaginaRegistro(Router $router)
     {
-        $router->render('registro/index', [], 'layouts/layout');
+        $router->render('registro/index', [], 'layout');
     }
 
     public static function buscaUsuario()

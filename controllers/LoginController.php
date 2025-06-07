@@ -11,6 +11,6 @@ class LoginController
     {
         $router->render('login/index', [
             'titulo' => 'Iniciar Sesión'
-        ], 'layouts/login');
+        ], 'login');
     }
 }

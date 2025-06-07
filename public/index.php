@@ -10,6 +10,7 @@ use Controllers\ClienteController;
 use Controllers\RolesController;
 use Controllers\LoginController;
 use Controllers\RegistroController;
+use Controllers\AplicacionController;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
@@ -35,6 +36,13 @@ $router->get('/busca_usuario', [RegistroController::class, 'buscaUsuario']);
 $router->post('/guarda_usuario', [RegistroController::class, 'guardarUsuario']);
 $router->post('/modifica_usuario', [RegistroController::class, 'modificaUsuario']);
 $router->post('/elimina_usuario', [RegistroController::class, 'eliminaUsuario']);
+
+// Ruta para aplicaciones
+$router->get('/aplicaciones', [AplicacionController::class, 'mostrarAplicaciones']);
+$router->get('/busca_aplicacion', [AplicacionController::class, 'buscaAplicacion']);
+$router->post('/guarda_aplicacion', [AplicacionController::class, 'guardarAplicacion']);
+$router->post('/modifica_aplicacion', [AplicacionController::class, 'modificaAplicacion']);
+$router->post('/elimina_aplicacion', [AplicacionController::class, 'eliminaAplicacion']);
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();

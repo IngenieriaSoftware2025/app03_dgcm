@@ -12,219 +12,155 @@ class ClienteController extends ActiveRecord
 
     public static function mostrarPagina(Router $router)
     {
-        $router->render('clientes/clientes', [], 'layouts/layout');
+        $router->render('clientes/clientes', [], 'layout');
     }
 
     public static function guardarCliente()
     {
-        getHeadersApi();
-
-        // Sanitizar el nombre y validar
-        $_POST['nombres'] = ucwords(strtolower(trim(htmlspecialchars($_POST['nombres']))));
-        $cantidad_nombre = strlen($_POST['nombres']);
-        if ($cantidad_nombre < 3) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Nombre debe tener mas de 2 caracteres'
-            ]);
-            return;
-        }
-
-        $_POST['apellidos'] = ucwords(strtolower(trim(htmlspecialchars($_POST['apellidos']))));
-        $cantidad_apellido = strlen($_POST['apellidos']);
-        if ($cantidad_apellido < 3) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Apellido debe tener mas de 2 caracteres'
-            ]);
-            return;
-        }
-
-        $_POST['telefono'] = filter_var($_POST['telefono'], FILTER_SANITIZE_NUMBER_INT);
-        if (strlen($_POST['telefono']) != 8) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Telefono debe tener 8 numeros'
-            ]);
-            return;
-        }
-
-        $_POST['sar'] = filter_var($_POST['sar'], FILTER_SANITIZE_NUMBER_INT);
-
-        $_POST['correo'] = filter_var($_POST['correo'], FILTER_SANITIZE_EMAIL);
-        if (!filter_var($_POST['correo'], FILTER_VALIDATE_EMAIL)) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'El correo electrónico no es válido'
-            ]);
-            return;
-        }
-
-        // Despues de sanitizar se envian los datos a guardar
         try {
-            $cliente = new Clientes(
-                [
-                    'nombres' => $_POST['nombres'],
-                    'apellidos' => $_POST['apellidos'],
-                    'telefono' => $_POST['telefono'],
-                    'sar' => $_POST['sar'],
-                    'correo' => $_POST['correo'],
-                    'situacion' => 1
-                ]
-            );
-
-            $crear = $cliente->crear();
-
-            http_response_code(200);
-            echo json_encode([
-                'codigo' => 1,
-                'mensaje' => 'Exito al guardar cliente'
+            // Validar campos requeridos usando helper
+            $validacion = self::validarRequeridos($_POST, [
+                'nombres',
+                'apellidos',
+                'telefono',
+                'correo'
             ]);
+
+            if ($validacion !== true) {
+                self::respuestaJSON(0, $validacion, null, 400);
+            }
+
+            // Sanitizar datos usando helper
+            $datos = self::sanitizarDatos($_POST);
+
+            // Crear cliente con validaciones personalizadas
+            $cliente = new Clientes([
+                'nombres' => ucwords(strtolower($datos['nombres'])),
+                'apellidos' => ucwords(strtolower($datos['apellidos'])),
+                'telefono' => filter_var($datos['telefono'], FILTER_SANITIZE_NUMBER_INT),
+                'sar' => filter_var($datos['sar'] ?? '', FILTER_SANITIZE_NUMBER_INT),
+                'correo' => filter_var($datos['correo'], FILTER_SANITIZE_EMAIL),
+                'situacion' => 1
+            ]);
+
+            // Definir validaciones específicas de cliente
+            $validaciones = [
+                // Validar longitud de nombres
+                function ($cliente) {
+                    if (strlen($cliente->nombres) < 3) {
+                        return 'Nombre debe tener más de 2 caracteres';
+                    }
+                    if (strlen($cliente->apellidos) < 3) {
+                        return 'Apellido debe tener más de 2 caracteres';
+                    }
+                    return true;
+                },
+
+                // Validar teléfono
+                function ($cliente) {
+                    if (strlen($cliente->telefono) != 8) {
+                        return 'Teléfono debe tener exactamente 8 dígitos';
+                    }
+                    return true;
+                },
+
+                // Validar correo
+                function ($cliente) {
+                    if (!filter_var($cliente->correo, FILTER_VALIDATE_EMAIL)) {
+                        return 'El correo electrónico no es válido';
+                    }
+                    return true;
+                },
+
+                // Validar correo único
+                function ($cliente) {
+                    if (Clientes::valorExiste('correo', $cliente->correo)) {
+                        return 'El correo ya está registrado en el sistema';
+                    }
+                    return true;
+                }
+            ];
+
+            // Crear con validaciones y respuesta automática
+            $cliente->crearConRespuesta($validaciones);
         } catch (Exception $e) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Error al guardar cliente',
-                'detalle' => $e->getMessage()
-            ]);
+            self::respuestaJSON(0, 'Error al guardar cliente: ' . $e->getMessage(), null, 500);
         }
     }
 
     public static function buscaCliente()
     {
-        try {
-            $consulta = "SELECT * FROM clientes WHERE situacion  = 1 ORDER BY nombres";
-            $cliente =  self::fetchArray($consulta);
-
-            if (count($cliente) > 0) {
-                http_response_code(200);
-                echo json_encode([
-                    'codigo' => 1,
-                    'mensaje' => 'Exito al buscar clientes',
-                    'data' => $cliente
-                ]);
-            } else {
-                http_response_code(400);
-                echo json_encode([
-                    'codigo' => 0,
-                    'mensaje' => 'Error al buscar clientes',
-                    'detalle' => 'No hay clientes'
-                ]);
-            }
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Error en el servidor',
-                'detalle' => $e->getMessage()
-            ]);
-        }
+        // Usando el helper para buscar clientes activos
+        Clientes::buscarConRespuesta("situacion = 1", "nombres, apellidos");
     }
 
     public static function modificaCliente()
     {
-        getHeadersApi();
-        $id = $_POST['id_cliente'];
-
-        // Sanitizar el nombre y validar
-        $_POST['nombres'] = ucwords(strtolower(trim(htmlspecialchars($_POST['nombres']))));
-        $cantidad_nombre = strlen($_POST['nombres']);
-        if ($cantidad_nombre < 3) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Nombre debe tener mas de 2 caracteres'
-            ]);
-            return;
-        }
-
-        $_POST['apellidos'] = ucwords(strtolower(trim(htmlspecialchars($_POST['apellidos']))));
-        $cantidad_apellido = strlen($_POST['apellidos']);
-        if ($cantidad_apellido < 3) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Apellido debe tener mas de 2 caracteres'
-            ]);
-            return;
-        }
-
-        $_POST['telefono'] = filter_var($_POST['telefono'], FILTER_SANITIZE_NUMBER_INT);
-        if (strlen($_POST['telefono']) != 8) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Telefono debe tener 8 numeros'
-            ]);
-            return;
-        }
-
-        $_POST['sar'] = filter_var($_POST['sar'], FILTER_SANITIZE_NUMBER_INT);
-
-        $_POST['correo'] = filter_var($_POST['correo'], FILTER_SANITIZE_EMAIL);
-        if (!filter_var($_POST['correo'], FILTER_VALIDATE_EMAIL)) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'El correo electrónico no es válido'
-            ]);
-            return;
-        }
-
         try {
-            $data = Clientes::find($id);
-            $data->sincronizar(
-                [
-                    'nombres' => $_POST['nombres'],
-                    'apellidos' => $_POST['apellidos'],
-                    'telefono' => $_POST['telefono'],
-                    'sar' => $_POST['sar'],
-                    'correo' => $_POST['correo'],
-                    'situacion' => 1
-                ]
-            );
 
-            $data->actualizar();
+            // Validar que llegue el ID
+            if (empty($_POST['id_cliente'])) {
+                self::respuestaJSON(0, 'ID de cliente requerido', null, 400);
+            }
 
-            http_response_code(200);
-            echo json_encode([
-                'codigo' => 1,
-                'mensaje' => 'Exito al actualizar'
-            ]);
+            $id = $_POST['id_cliente'];
+
+            // Buscar cliente existente
+            $cliente = Clientes::find(['id_cliente' => $id]);
+            if (!$cliente) {
+                self::respuestaJSON(0, 'Cliente no encontrado', null, 404);
+            }
+
+            // Sanitizar nuevos datos
+            $datos = self::sanitizarDatos($_POST);
+
+            // Preparar TODOS los datos para sincronizar
+            $datosParaSincronizar = [
+                'nombres' => ucwords(strtolower($datos['nombres'])),
+                'apellidos' => ucwords(strtolower($datos['apellidos'])),
+                'telefono' => filter_var($datos['telefono'], FILTER_SANITIZE_NUMBER_INT),
+                'sar' => filter_var($datos['sar'] ?? '', FILTER_SANITIZE_NUMBER_INT),
+                'correo' => filter_var($datos['correo'], FILTER_SANITIZE_EMAIL),
+                'situacion' => 1
+            ];
+
+            // Usar sincronizar una sola vez con todos los datos
+            $cliente->sincronizar($datosParaSincronizar);
+
+            // alidaciones excluyendo el registro actual
+            $validaciones = [
+                function ($cliente) {
+                    if (strlen($cliente->nombres) < 3) return 'Nombre debe tener más de 2 caracteres';
+                    if (strlen($cliente->apellidos) < 3) return 'Apellido debe tener más de 2 caracteres';
+                    if (strlen($cliente->telefono) != 8) return 'Teléfono debe tener exactamente 8 dígitos';
+                    if (!filter_var($cliente->correo, FILTER_VALIDATE_EMAIL)) return 'El correo electrónico no es válido';
+
+                    // Validar unicidad excluyendo el registro actual
+                    if (Clientes::valorExiste('correo', $cliente->correo, $cliente->id_cliente, 'id_cliente')) {
+                        return 'El correo ya está en uso por otro cliente';
+                    }
+
+                    return true;
+                }
+            ];
+            // Actualizar con validaciones automáticas
+            $cliente->actualizarConRespuesta($validaciones);
         } catch (Exception $e) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Error al actualizar',
-                'detalle' => $e->getMessage()
-            ]);
+            self::respuestaJSON(0, 'Error al modificar cliente: ' . $e->getMessage(), null, 500);
         }
     }
 
     public static function eliminaCliente()
     {
-        getHeadersApi();
         try {
-            $id = filter_var($_POST['id_cliente'], FILTER_SANITIZE_NUMBER_INT);
-            $consulta = "UPDATE clientes SET situacion = 0 WHERE id_cliente = $id";
-            self::SQL($consulta);
-
-            http_response_code(200);
-            echo json_encode([
-                'codigo' => 1,
-                'mensaje' => 'Exito al eliminar'
-            ]);
+            if (empty($_POST['id_cliente'])) {
+                self::respuestaJSON(0, 'ID de cliente requerido', null, 400);
+            }
+            // Usamos el helper logico para eliminar el cliente
+            Clientes::eliminarLogicoConRespuesta($_POST['id_cliente'], 'id_cliente');
         } catch (Exception $e) {
             http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Error al eliminar',
-                'detalle' => $e->getMessage()
-            ]);
+            self::respuestaJSON(0, 'Error al eliminar cliente: ' . $e->getMessage(), null, 500);
         }
     }
 }

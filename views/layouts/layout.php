@@ -36,7 +36,7 @@
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/app03_dgcm/clientes"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a clientes</a>
+                                <a class="dropdown-item nav-link text-white " href="/app03_dgcm/aplicaciones"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a aplicaciones</a>
                             </li>
 
                         </ul>
