@@ -288,10 +288,10 @@ const guardaUsuario = async (e) => {
     }
 
     const body = new FormData(FormRegistro);
-    console.log('=== DATOS QUE SE ENVÍAN ===');
-    for (let [key, value] of body.entries()) {
-        console.log(`${key}: ${value}`);
-    }
+    // console.log('=== DATOS QUE SE ENVÍAN ===');
+    // for (let [key, value] of body.entries()) {
+    //     console.log(`${key}: ${value}`);
+    // }
 
     const url = '/app03_dgcm/guarda_usuario';
     const config = {
@@ -302,12 +302,12 @@ const guardaUsuario = async (e) => {
     try {
         const respuesta = await fetch(url, config);
 
-        console.log('=== RESPUESTA DEL SERVIDOR ===');
-        console.log('Status:', respuesta.status);
-        console.log('StatusText:', respuesta.statusText);
+        // console.log('=== RESPUESTA DEL SERVIDOR ===');
+        // console.log('Status:', respuesta.status);
+        // console.log('StatusText:', respuesta.statusText);
 
         const datos = await respuesta.json();
-        console.log('Datos recibidos:', datos);
+        // console.log('Datos recibidos:', datos);
 
         if (datos.codigo === 1) {
             Swal.fire({
@@ -347,8 +347,8 @@ const guardaUsuario = async (e) => {
         }
 
     } catch (error) {
-        console.log('=== ERROR COMPLETO ===');
-        console.log(error);
+        // console.log('=== ERROR COMPLETO ===');
+        // console.log(error);
         Swal.fire({
             position: "center",
             icon: "error",
@@ -379,7 +379,7 @@ const buscaUsuario = async () => {
 
         // Verificar si es JSON válido
         const textoRespuesta = await respuesta.text();
-        console.log('Respuesta cruda del servidor:', textoRespuesta);
+        // console.log('Respuesta cruda del servidor:', textoRespuesta);
 
         let datos;
         try {
@@ -390,7 +390,7 @@ const buscaUsuario = async () => {
             return;
         }
 
-        console.log('Datos parseados:', datos);
+        // console.log('Datos parseados:', datos);
 
         if (datos.codigo === 1) {
             datosDeTabla.clear().draw();
@@ -438,6 +438,15 @@ const limpiarFormulario = () => {
     inputs.forEach(input => {
         input.classList.remove('is-valid', 'is-invalid');
     });
+
+    // LIMPIAR VISTA PREVIA
+    const contenedor = document.getElementById('contenedorVistaPrevia');
+    const imagen = document.getElementById('vistaPrevia');
+    if (contenedor) {
+        contenedor.classList.add('d-none');
+        imagen.src = '';
+    }
+
 
     BtnGuardar.classList.remove('d-none');
     BtnModificar.classList.add('d-none');
@@ -581,6 +590,103 @@ const eliminaUsuario = async (e) => {
         console.log(error);
     }
 };
+
+// FUNCIÓN PARA MOSTRAR VISTA PREVIA
+const mostrarVistaPrevia = (input) => {
+    const archivo = input.files[0];
+    const contenedor = document.getElementById('contenedorVistaPrevia');
+    const imagen = document.getElementById('vistaPrevia');
+    const infoArchivo = document.getElementById('infoArchivo');
+
+    if (archivo) {
+        // Validar tamaño (5MB máximo)
+        const tamañoMB = archivo.size / (1024 * 1024);
+        if (tamañoMB > 5) {
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Archivo muy grande",
+                text: "La imagen no puede exceder 5MB",
+                showConfirmButton: false,
+                timer: 2000
+            });
+            input.value = '';
+            return;
+        }
+
+        // Validar tipo de archivo
+        const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        if (!tiposPermitidos.includes(archivo.type)) {
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Formato no válido",
+                text: "Solo se permiten imágenes JPG, PNG o GIF",
+                showConfirmButton: false,
+                timer: 2000
+            });
+            input.value = '';
+            return;
+        }
+
+        // Crear vista previa
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            imagen.src = e.target.result;
+            infoArchivo.textContent = `${archivo.name} (${tamañoMB.toFixed(2)} MB)`;
+            contenedor.classList.remove('d-none');
+
+            // Animación suave
+            contenedor.style.opacity = '0';
+            setTimeout(() => {
+                contenedor.style.transition = 'opacity 0.3s';
+                contenedor.style.opacity = '1';
+            }, 10);
+        };
+        reader.readAsDataURL(archivo);
+
+    } else {
+        contenedor.classList.add('d-none');
+    }
+}
+
+// FUNCIÓN PARA ELIMINAR VISTA PREVIA
+const eliminarVistaPrevia = () => {
+    const input = document.getElementById('fotografia');
+    const contenedor = document.getElementById('contenedorVistaPrevia');
+    const imagen = document.getElementById('vistaPrevia');
+
+    input.value = '';
+    imagen.src = '';
+    contenedor.classList.add('d-none');
+
+    Swal.fire({
+        position: "center",
+        icon: "info",
+        title: "Imagen eliminada",
+        showConfirmButton: false,
+        timer: 1000
+    });
+}
+
+// Eventos de fotografia
+document.addEventListener('DOMContentLoaded', () => {
+    // Event listeners existentes...
+    mostrarFormulario('Registrar Usuario');
+
+    const inputFotografia = document.getElementById('fotografia');
+    const btnEliminarImagen = document.getElementById('btnEliminarImagen');
+
+    if (inputFotografia) {
+        inputFotografia.addEventListener('change', (e) => {
+            mostrarVistaPrevia(e.target);
+        });
+    }
+
+    if (btnEliminarImagen) {
+        btnEliminarImagen.addEventListener('click', eliminarVistaPrevia);
+    }
+});
 
 // Eventos
 validarTelefono.addEventListener('blur', validacionTelefono);

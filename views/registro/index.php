@@ -82,23 +82,31 @@
                         <!-- Fotografía -->
                         <div class="row mb-3 justify-content-center">
                             <div class="col-lg-6">
-                                <label for="fotografia" class="form-label">Fotografía</label>
+                                <label for="fotografia" class="form-label">
+                                    <i class="bi bi-camera-fill me-1"></i>Fotografía del Usuario
+                                </label>
                                 <input type="file" class="form-control" id="fotografia" name="fotografia" accept="image/*">
-                                <small class="text-muted">JPG, PNG, GIF. Max: 2MB</small>
+                                <small class="text-muted">Formatos: JPG, PNG, GIF (Máx. 5MB)</small>
                             </div>
                         </div>
 
-                        <!-- Términos y condiciones -->
+                        <!-- CONTENEDOR DE VISTA PREVIA -->
                         <div class="row mb-3 justify-content-center">
-                            <div class="col-12 text-center">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="aceptarTerminos" required>
-                                    <label class="form-check-label" for="aceptarTerminos">
-                                        Acepto los <a href="#!">Términos y Condiciones</a> del sistema
-                                    </label>
+                            <div class="col-lg-6">
+                                <div id="contenedorVistaPrevia" class="d-none">
+                                    <label class="form-label">Vista Previa:</label>
+                                    <div class="text-center p-3 border rounded" style="background-color: #f8f9fa;">
+                                        <img id="vistaPrevia" src="" alt="Vista previa de la imagen"
+                                            class="img-fluid rounded shadow"
+                                            style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                        <br>
+                                        <small class="text-muted mt-2 d-block" id="infoArchivo"></small>
+                                        <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="btnEliminarImagen">
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </form>
                 </div>
 
