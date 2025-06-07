@@ -186,7 +186,6 @@ class RegistroController extends ActiveRecord
             // Sincronizar datos al usuario
             $usuario->sincronizar($datosParaSincronizar);
 
-
             $validaciones = [
                 function ($usuario) {
                     if (strlen($usuario->nombre1) < 2) return 'El primer nombre debe tener más de 2 caracteres';
@@ -198,6 +197,12 @@ class RegistroController extends ActiveRecord
                     // Validar unicidad excluyendo el registro actual
                     if (Usuarios::valorExiste('correo', $usuario->correo, $usuario->id_usuario, 'id_usuario')) {
                         return 'El correo ya está en uso por otro usuario';
+                    }
+                    if (Usuarios::valorExiste('telefono', $usuario->telefono, $usuario->id_usuario, 'id_usuario')) {
+                        return 'El teléfono ya está en uso por otro usuario';
+                    }
+                    if (!empty($usuario->dpi) && Usuarios::valorExiste('dpi', $usuario->dpi, $usuario->id_usuario, 'id_usuario')) {
+                        return 'El DPI ya está en uso por otro usuario';
                     }
                     if (!empty($usuario->dpi) && Usuarios::valorExiste('dpi', $usuario->dpi, $usuario->id_usuario, 'id_usuario')) {
                         return 'El DPI ya está en uso por otro usuario';

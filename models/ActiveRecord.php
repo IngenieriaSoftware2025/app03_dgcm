@@ -351,7 +351,7 @@ class ActiveRecord
         }
     }
 
-    // mETODOS NUEVOS PARA LA CLASE ACTIVE RECORD
+    // METODOS NUEVOS PARA LA CLASE ACTIVE RECORD
 
     // Respuesta JSON estandarizada
     public static function respuestaJSON($codigo, $mensaje, $data = null, $httpCode = 200)

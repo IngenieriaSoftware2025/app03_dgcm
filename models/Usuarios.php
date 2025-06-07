@@ -68,9 +68,6 @@ class Usuarios extends ActiveRecord
         foreach (static::$columnasDB as $columna) {
             $columna = strtolower($columna);
 
-            // Excluir el ID
-            if ($columna === 'id_usuario') continue;
-
             // Solo agregar si la propiedad existe y no es null
             if (property_exists($this, $columna)) {
                 $atributos[$columna] = $this->$columna;
