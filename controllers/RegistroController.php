@@ -119,7 +119,16 @@ class RegistroController extends ActiveRecord
                         return 'El DPI ya está registrado en el sistema';
                     }
                     return true;
+                },
+
+                // Validar telefono
+                function ($usuario) {
+                    if (!empty($usuario->telefono) && Usuarios::valorExiste('dpi', $usuario->telefono)) {
+                        return 'El telefono ya está registrado en el sistema';
+                    }
+                    return true;
                 }
+                
             ];
 
             // Crear con validaciones y respuesta automática
