@@ -498,7 +498,7 @@ class ActiveRecord
     }
 
     // Subir archivo de imagen
-    public static function subirImagen($archivo, $carpeta = 'usuarios', $maxSize = 2097152) // 2MB
+    public static function subirImagen($archivo, $carpeta = 'usuarios', $maxSize = 2097152, $nombrePersonalizado = null) // 2MB
     {
         try {
             // Validar que se subió un archivo
@@ -534,12 +534,26 @@ class ActiveRecord
 
             // Generar nombre único
             $extension = pathinfo($archivo['name'], PATHINFO_EXTENSION);
-            $nombreArchivo = uniqid('img_') . '_' . time() . '.' . $extension;
+            // $nombreArchivo = uniqid('img_') . '_' . time() . '.' . $extension;
+            // $rutaCompleta = $carpetaDestino . $nombreArchivo;
+
+            if ($nombrePersonalizado) {
+                // Usar nombre personalizado (DPI)
+                $nombreArchivo = $nombrePersonalizado . '.' . $extension;
+            } else {
+                // Nombre único por defecto
+                $nombreArchivo = uniqid('img_') . '_' . time() . '.' . $extension;
+            }
+
             $rutaCompleta = $carpetaDestino . $nombreArchivo;
+
+            // 🔧 VERIFICAR SI YA EXISTE Y ELIMINAR
+            if (file_exists($rutaCompleta)) {
+                unlink($rutaCompleta); // Eliminar archivo existente
+            }
 
             // Mover archivo
             if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
-                // Retornar ruta relativa para guardar en BD
                 $rutaRelativa = "/app03_dgcm/storage/imgs/$carpeta/$nombreArchivo";
                 return [
                     'success' => true,
