@@ -594,4 +594,37 @@ class ActiveRecord
             return null;
         }
     }
+
+    // Buscar registros con relación a otra tabla
+    public static function buscarConRelacionRespuesta($tablaRelacion, $llaveLocal, $llaveForanea, $camposRelacion = [], $condiciones = "1=1", $orden = null)
+    {
+        try {
+            $query = "SELECT 
+                    " . static::$tabla . ".*";
+
+            // Agregar campos de la relación
+            foreach ($camposRelacion as $alias => $campo) {
+                $query .= ", " . $tablaRelacion . "." . $campo . " as " . $alias;
+            }
+
+            $query .= " FROM " . static::$tabla . "
+                INNER JOIN " . $tablaRelacion . " 
+                ON " . static::$tabla . "." . $llaveLocal . " = " . $tablaRelacion . "." . $llaveForanea . "
+                WHERE " . $condiciones;
+
+            if ($orden) {
+                $query .= " ORDER BY " . $orden;
+            }
+
+            $resultados = self::fetchArray($query);
+
+            if ($resultados && count($resultados) > 0) {
+                self::respuestaJSON(1, 'Registros obtenidos exitosamente', $resultados);
+            } else {
+                self::respuestaJSON(1, 'No hay registros', []);
+            }
+        } catch (Exception $e) {
+            self::respuestaJSON(0, 'Error al buscar registros: ' . $e->getMessage(), null, 500);
+        }
+    }
 }

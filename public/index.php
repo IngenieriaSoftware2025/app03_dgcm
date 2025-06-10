@@ -11,6 +11,7 @@ use Controllers\RolesController;
 use Controllers\LoginController;
 use Controllers\RegistroController;
 use Controllers\AplicacionController;
+use Controllers\PermisoController;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
@@ -43,6 +44,14 @@ $router->get('/busca_aplicacion', [AplicacionController::class, 'buscaAplicacion
 $router->post('/guarda_aplicacion', [AplicacionController::class, 'guardarAplicacion']);
 $router->post('/modifica_aplicacion', [AplicacionController::class, 'modificaAplicacion']);
 $router->post('/elimina_aplicacion', [AplicacionController::class, 'eliminaAplicacion']);
+
+// Rutas para los permisos
+$router->get('/permisos', [PermisoController::class, 'mostrarPermisos']);
+$router->get('/busca_permiso', [PermisoController::class, 'buscaPermiso']);
+$router->post('/guarda_permiso', [PermisoController::class, 'guardarPermiso']);
+$router->post('/modifica_permiso', [PermisoController::class, 'modificaPermiso']);
+$router->post('/elimina_permiso', [PermisoController::class, 'eliminaPermiso']);
+
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();
