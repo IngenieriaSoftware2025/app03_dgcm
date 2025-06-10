@@ -41,6 +41,9 @@
                             <li>
                                 <a class="dropdown-item nav-link text-white " href="/app03_dgcm/permisos"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a permisos</a>
                             </li>
+                            <li>
+                                <a class="dropdown-item nav-link text-white " href="/app03_dgcm/roles"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a roles</a>
+                            </li>
 
                         </ul>
                     </div>

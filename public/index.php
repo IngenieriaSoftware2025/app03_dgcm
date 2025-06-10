@@ -19,11 +19,11 @@ $router->setBaseURL('/' . $_ENV['APP_NAME']);
 $router->get('/', [AppController::class, 'index']);
 
 // Get en nuestro idioma significa obtener, osea obtiene la vista de la pagina y la muestra al cliente
-$router->get('/clientes', [ClienteController::class, 'mostrarPagina']);
-$router->get('/busca_cliente', [ClienteController::class, 'buscaCliente']);
-$router->post('/elimina_cliente', [ClienteController::class, 'eliminaCliente']);
-$router->post('/guarda_cliente', [ClienteController::class, 'guardarCliente']);
-$router->post('/modifica_cliente', [ClienteController::class, 'modificaCliente']);
+$router->get('/roles', [RolesController::class, 'mostrarPagina']);
+$router->get('/busca_rol', [RolesController::class, 'buscaRol']);
+$router->post('/elimina_rol', [RolesController::class, 'eliminaRol']);
+$router->post('/guarda_rol', [RolesController::class, 'guardarRol']);
+$router->post('/modifica_rol', [RolesController::class, 'modificaRol']);
 
 // Rutas para Login
 $router->get('/login', [LoginController::class, 'mostrarLogin']);
