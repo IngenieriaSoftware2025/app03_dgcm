@@ -12,6 +12,7 @@ use Controllers\RegistroController;
 use Controllers\AplicacionController;
 use Controllers\PermisoController;
 use Controllers\TiendaController;
+use Controllers\EmpleadoController;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
@@ -61,6 +62,13 @@ $router->post('/elimina_permiso', [PermisoController::class, 'eliminaPermiso']);
 $router->get('/obtener_usuarios', [PermisoController::class, 'obtenerUsuarios']);
 $router->get('/obtener_roles', [PermisoController::class, 'obtenerRoles']);
 
+// Rutas de empleado
+$router->get('/empleado', [EmpleadoController::class, 'dashboard']);
+$router->get('/empleado/productos', [EmpleadoController::class, 'productos']);
+$router->get('/empleado/categorias', [EmpleadoController::class, 'categorias']);
+$router->get('/empleado/pedidos', [EmpleadoController::class, 'pedidos']);
+$router->get('/empleado/clientes', [EmpleadoController::class, 'clientes']);
+$router->get('/empleado/perfil', [EmpleadoController::class, 'perfil']);
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();
