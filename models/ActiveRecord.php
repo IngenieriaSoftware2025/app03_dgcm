@@ -259,6 +259,16 @@ class ActiveRecord
         return $array;
     }
 
+    // Ejecutar una consulta SQL y devolver un array de objetos
+    public static function fetchScalar(string $sql, array $params = [])
+    {
+        $stmt = self::$db->prepare($sql);
+        $stmt->execute($params);
+        $value = $stmt->fetchColumn();
+        $stmt->closeCursor();
+        return $value !== false ? $value : null;
+    }
+
     public static function fetchArray($query)
     {
         try {
@@ -656,6 +666,60 @@ class ActiveRecord
             }
         } catch (Exception $e) {
             self::respuestaJSON(0, 'Error al buscar registros: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public static function buscarConMultiplesRelaciones($relaciones = [], $condiciones = "", $orden = "", $limite = "")
+    {
+        try {
+            $tabla = static::$tabla;
+
+            // SELECT base
+            $sql = "SELECT {$tabla}.*";
+
+            // FROM tabla principal
+            $from = " FROM {$tabla}";
+
+            // Procesar cada relación
+            foreach ($relaciones as $alias => $config) {
+                // Agregar campos del SELECT
+                if (isset($config['campos']) && is_array($config['campos'])) {
+                    foreach ($config['campos'] as $alias_campo => $campo_real) {
+                        $sql .= ", {$config['tabla']}.{$campo_real} as {$alias_campo}";
+                    }
+                }
+
+                // Agregar JOIN
+                $tipoJoin = $config['tipo'] ?? 'INNER';
+                $from .= " {$tipoJoin} JOIN {$config['tabla']} ON {$tabla}.{$config['llave_local']} = {$config['tabla']}.{$config['llave_foranea']}";
+            }
+
+            // Construir consulta completa
+            $sql .= $from;
+
+            if ($condiciones) {
+                $sql .= " WHERE {$condiciones}";
+            }
+
+            if ($orden) {
+                $sql .= " ORDER BY {$orden}";
+            }
+
+            if ($limite) {
+                $sql .= " LIMIT {$limite}";
+            }
+
+            // Ejecutar consulta
+            $resultado = self::fetchArray($sql);
+
+            // Respuesta automática
+            if ($resultado && count($resultado) > 0) {
+                self::respuestaJSON(1, 'Registros encontrados', $resultado);
+            } else {
+                self::respuestaJSON(1, 'No hay registros', []);
+            }
+        } catch (Exception $e) {
+            self::respuestaJSON(0, 'Error en la consulta: ' . $e->getMessage(), null, 500);
         }
     }
 }

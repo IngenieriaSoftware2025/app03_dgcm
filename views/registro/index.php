@@ -1,3 +1,8 @@
+<?php
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+$userRol = $_SESSION['user']['rol'] ?? 'cliente';
+?>
+
 <!-- SECCIÓN DEL FORMULARIO (Vista 1) -->
 <div id="seccionFormulario" class="row justify-content-center p-3">
     <div class="col-lg-10">
@@ -52,6 +57,20 @@
                                 <label for="dpi" class="form-label">DPI</label>
                                 <input type="number" class="form-control" id="dpi" name="dpi" placeholder="Ingrese su número de DPI">
                             </div>
+                        </div>
+
+                        <div class="row mb-3 justify-content-center">
+                            <?php if ($userRol === 'administrador'): ?>
+                                <div class="col-lg-6">
+                                    <label for="rol" class="form-label">Rol</label>
+                                    <select id="rol" name="rol" class="form-select" required>
+                                        <option value="">-- Selecciona un rol --</option>
+                                        <option value="cliente">Cliente</option>
+                                        <option value="empleado">Empleado</option>
+                                        <option value="administrador">Administrador</option>
+                                    </select>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <!-- Correo -->

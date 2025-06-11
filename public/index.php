@@ -52,6 +52,9 @@ $router->post('/guarda_permiso', [PermisoController::class, 'guardarPermiso']);
 $router->post('/modifica_permiso', [PermisoController::class, 'modificaPermiso']);
 $router->post('/elimina_permiso', [PermisoController::class, 'eliminaPermiso']);
 
+$router->get('/obtener_usuarios', [PermisoController::class, 'obtenerUsuarios']);
+$router->get('/obtener_roles', [PermisoController::class, 'obtenerRoles']);
+
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();

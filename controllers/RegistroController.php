@@ -16,12 +16,19 @@ class RegistroController extends ActiveRecord
 
     public static function buscaUsuario()
     {
+        if ($_SESSION['user']['rol'] !== 'administrador') {
+            unset($_POST['rol']);
+        }
         // usando helper de ActiveRecord
         Usuarios::buscarConRespuesta("situacion = 1", "nombre1, apellido1");
     }
 
     public static function guardarUsuario()
     {
+        if ($_SESSION['user']['rol'] !== 'administrador') {
+            unset($_POST['rol']);
+        }
+
         try {
             // Validar campos requeridos usando helper
             $validacion = self::validarRequeridos($_POST, [
@@ -29,7 +36,8 @@ class RegistroController extends ActiveRecord
                 'apellido1',
                 'telefono',
                 'correo',
-                'usuario_clave'
+                'usuario_clave',
+                'rol'
             ]);
 
             if ($validacion !== true) {
@@ -52,6 +60,7 @@ class RegistroController extends ActiveRecord
                 'token' => uniqid('user_', true),
                 'fecha_creacion' => date('Y-m-d H:i:s'),
                 'fecha_clave' => date('Y-m-d H:i:s'),
+                'rol' => $datos['rol'],
                 'situacion' => 1
             ]);
 
@@ -111,6 +120,10 @@ class RegistroController extends ActiveRecord
 
     public static function modificaUsuario()
     {
+        if ($_SESSION['user']['rol'] !== 'administrador') {
+            unset($_POST['rol']);
+        }
+
         try {
             // Validar que llegue el ID
             if (empty($_POST['id_usuario'])) {
@@ -156,7 +169,8 @@ class RegistroController extends ActiveRecord
                 'apellido2' => ucwords(strtolower($datos['apellido2'] ?? '')),
                 'telefono' => filter_var($datos['telefono'], FILTER_SANITIZE_NUMBER_INT),
                 'dpi' => filter_var($datos['dpi'] ?? '', FILTER_SANITIZE_NUMBER_INT),
-                'correo' => filter_var($datos['correo'], FILTER_SANITIZE_EMAIL)
+                'correo' => filter_var($datos['correo'], FILTER_SANITIZE_EMAIL),
+                'rol' => $datos['rol']
             ];
 
             // Si hay nueva contraseña, actualizarla
@@ -200,6 +214,10 @@ class RegistroController extends ActiveRecord
 
     public static function eliminaUsuario()
     {
+        if ($_SESSION['user']['rol'] !== 'administrador') {
+            unset($_POST['rol']);
+        }
+
         try {
             // Validar que llegue el ID
             if (empty($_POST['id_usuario'])) {

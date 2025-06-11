@@ -19,9 +19,8 @@ class PermisoController extends ActiveRecord
         try {
             // Validar campos requeridos usando helper
             $validacion = self::validarRequeridos($_POST, [
-                'id_app',
-                'nombre_permiso',
-                'clave_permiso',
+                'id_usuario',
+                'id_rol',
                 'descripcion'
             ]);
 
@@ -34,9 +33,8 @@ class PermisoController extends ActiveRecord
 
             // Crear permiso con validaciones personalizadas
             $permiso = new Permisos([
-                'id_app' => filter_var($datos['id_app'], FILTER_SANITIZE_NUMBER_INT),
-                'nombre_permiso' => ucwords(strtolower($datos['nombre_permiso'])),
-                'clave_permiso' => strtoupper($datos['clave_permiso']), // Clave en mayúsculas
+                'id_usuario' => filter_var($datos['id_usuario'], FILTER_SANITIZE_NUMBER_INT),
+                'id_rol' => filter_var($datos['id_rol'], FILTER_SANITIZE_NUMBER_INT),
                 'descripcion' => ucfirst(strtolower($datos['descripcion'])),
                 'fecha_creacion' => date('Y-m-d H:i:s'),
                 'situacion' => 1
@@ -44,46 +42,63 @@ class PermisoController extends ActiveRecord
 
             // Definir validaciones específicas de permiso
             $validaciones = [
-                // Validar longitud de campos
+                // Validar que usuario y rol existan
                 function ($permiso) {
-                    if (strlen($permiso->nombre_permiso) < 3) {
-                        return 'Nombre del permiso debe tener más de 3 caracteres';
+                    if (empty($permiso->id_usuario)) {
+                        return 'ID de usuario requerido';
                     }
-                    if (strlen($permiso->clave_permiso) < 2) {
-                        return 'Clave del permiso debe tener más de 2 caracteres';
+                    if (empty($permiso->id_rol)) {
+                        return 'ID de rol requerido';
                     }
+                    return true;
+                },
+
+                // Validar descripción
+                function ($permiso) {
                     if (strlen($permiso->descripcion) < 5) {
                         return 'Descripción debe tener más de 5 caracteres';
                     }
-                    return true;
-                },
-
-                // Validar longitudes máximas
-                function ($permiso) {
-                    if (strlen($permiso->nombre_permiso) > 255) {
-                        return 'Nombre del permiso no puede exceder 255 caracteres';
-                    }
-                    if (strlen($permiso->clave_permiso) > 100) {
-                        return 'Clave del permiso no puede exceder 100 caracteres';
-                    }
-                    if (strlen($permiso->descripcion) > 1000) {
-                        return 'Descripción no puede exceder 1000 caracteres';
+                    if (strlen($permiso->descripcion) > 255) {
+                        return 'Descripción no puede exceder 255 caracteres';
                     }
                     return true;
                 },
 
-                // Validar unicidad de la clave del permiso
+                // Validar que no exista ya la asignación usuario-rol
                 function ($permiso) {
-                    if (Permisos::valorExiste('clave_permiso', $permiso->clave_permiso)) {
-                        return 'La clave del permiso ya está registrada en el sistema';
+                    $sql   = "SELECT COUNT(*) FROM usuario_rol 
+                                WHERE id_usuario = ? AND id_rol = ? AND situacion = 1";
+                    $total = Permisos::fetchScalar($sql, [
+                        $permiso->id_usuario,
+                        $permiso->id_rol
+                    ]);
+
+                    if ($total > 0) {
+                        return 'El usuario ya tiene asignado este rol';
                     }
                     return true;
                 },
 
-                // Validar unicidad del nombre del permiso
+                // Validar que usuario exista
                 function ($permiso) {
-                    if (Permisos::valorExiste('nombre_permiso', $permiso->nombre_permiso)) {
-                        return 'El nombre del permiso ya está registrado en el sistema';
+                    $sql    = "SELECT COUNT(*) FROM usuarios 
+                                WHERE id_usuario = ? AND situacion = 1";
+                    $exists = Permisos::fetchScalar($sql, [$permiso->id_usuario]);
+
+                    if ($exists == 0) {
+                        return 'El usuario seleccionado no existe o está inactivo';
+                    }
+                    return true;
+                },
+
+                // Validar que rol exista
+                function ($permiso) {
+                    $sql    = "SELECT COUNT(*) FROM roles 
+                                WHERE id_rol = ? AND situacion = 1";
+                    $exists = Permisos::fetchScalar($sql, [$permiso->id_rol]);
+
+                    if ($exists == 0) {
+                        return 'El rol seleccionado no existe o está inactivo';
                     }
                     return true;
                 }
@@ -98,16 +113,34 @@ class PermisoController extends ActiveRecord
 
     public static function buscaPermiso()
     {
-        Permisos::buscarConRelacionRespuesta(
-            'aplicacion',                    // Tabla relacionada
-            'id_app',                       // Llave local
-            'id_app',                       // Llave foránea
-            [                               // Campos a traer de la relación
-                'aplicacion_siglas' => 'nombre_app_ct',
-                'aplicacion_nombre' => 'nombre_app_md'
+        Permisos::buscarConMultiplesRelaciones(
+            [
+                // Relación con usuarios
+                'usuario' => [
+                    'tabla' => 'usuarios',
+                    'llave_local' => 'id_usuario',
+                    'llave_foranea' => 'id_usuario',
+                    'tipo' => 'INNER',
+                    'campos' => [
+                        'usuario_nombre' => 'nombre1',
+                        'usuario_apellido' => 'apellido1',
+                        'usuario_correo' => 'correo'
+                    ]
+                ],
+                // Relación con roles
+                'rol' => [
+                    'tabla' => 'roles',
+                    'llave_local' => 'id_rol',
+                    'llave_foranea' => 'id_rol',
+                    'tipo' => 'INNER',
+                    'campos' => [
+                        'rol_nombre' => 'rol_nombre',
+                        'rol_descripcion' => 'descripcion'
+                    ]
+                ]
             ],
-            "permisos.situacion = 1",       // Condiciones
-            "permisos.nombre_permiso"       // Orden
+            "usuario_rol.situacion = 1",                    // Condiciones
+            "usuarios.nombre1, roles.rol_nombre"            // Orden
         );
     }
 
@@ -115,16 +148,16 @@ class PermisoController extends ActiveRecord
     {
         try {
             // Validar que llegue el ID
-            if (empty($_POST['id_permiso'])) {
-                self::respuestaJSON(0, 'ID de permiso requerido', null, 400);
+            if (empty($_POST['id_usuario_rol'])) {
+                self::respuestaJSON(0, 'ID de asignación requerido', null, 400);
             }
 
-            $id = $_POST['id_permiso'];
+            $id = $_POST['id_usuario_rol'];
 
             // Buscar permiso existente
-            $permiso = Permisos::find(['id_permiso' => $id]);
+            $permiso = Permisos::find(['id_usuario_rol' => $id]);
             if (!$permiso) {
-                self::respuestaJSON(0, 'Permiso no encontrado', null, 404);
+                self::respuestaJSON(0, 'Asignación no encontrada', null, 404);
             }
 
             // Sanitizar nuevos datos
@@ -132,9 +165,8 @@ class PermisoController extends ActiveRecord
 
             // Preparar TODOS los datos para sincronizar
             $datosParaSincronizar = [
-                'id_app' => filter_var($datos['id_app'], FILTER_SANITIZE_NUMBER_INT),
-                'nombre_permiso' => ucwords(strtolower($datos['nombre_permiso'])),
-                'clave_permiso' => strtoupper($datos['clave_permiso']), // Clave en mayúsculas
+                'id_usuario' => filter_var($datos['id_usuario'], FILTER_SANITIZE_NUMBER_INT),
+                'id_rol' => filter_var($datos['id_rol'], FILTER_SANITIZE_NUMBER_INT),
                 'descripcion' => ucfirst(strtolower($datos['descripcion'])),
                 'situacion' => 1
             ];
@@ -145,23 +177,42 @@ class PermisoController extends ActiveRecord
             // Validaciones excluyendo el registro actual
             $validaciones = [
                 function ($permiso) {
-                    // Validar longitudes mínimas
-                    if (strlen($permiso->nombre_permiso) < 3) return 'Nombre del permiso debe tener más de 3 caracteres';
-                    if (strlen($permiso->clave_permiso) < 2) return 'Clave del permiso debe tener más de 2 caracteres';
-                    if (strlen($permiso->descripcion) < 10) return 'Descripción debe tener más de 10 caracteres';
+                    // Validar campos requeridos
+                    if (empty($permiso->id_usuario)) return 'ID de usuario requerido';
+                    if (empty($permiso->id_rol)) return 'ID de rol requerido';
 
-                    // Validar longitudes máximas
-                    if (strlen($permiso->nombre_permiso) > 255) return 'Nombre del permiso no puede exceder 255 caracteres';
-                    if (strlen($permiso->clave_permiso) > 100) return 'Clave del permiso no puede exceder 100 caracteres';
-                    if (strlen($permiso->descripcion) > 1000) return 'Descripción no puede exceder 1000 caracteres';
+                    // Validar descripción
+                    if (strlen($permiso->descripcion) < 5) return 'Descripción debe tener más de 5 caracteres';
+                    if (strlen($permiso->descripcion) > 255) return 'Descripción no puede exceder 255 caracteres';
 
                     // Validar unicidad excluyendo el registro actual
-                    if (Permisos::valorExiste('clave_permiso', $permiso->clave_permiso, $permiso->id_permiso, 'id_permiso')) {
-                        return 'La clave del permiso ya está en uso por otro permiso';
+                    $sql   = "SELECT COUNT(*) FROM usuario_rol 
+                    WHERE id_usuario = ? AND id_rol = ? AND situacion = 1 
+                    AND id_usuario_rol != ?";
+                    $total = Permisos::fetchScalar($sql, [
+                        $permiso->id_usuario,
+                        $permiso->id_rol,
+                        $permiso->id_usuario_rol
+                    ]);
+
+                    if ($total > 0) {
+                        return 'El usuario ya tiene asignado este rol';
                     }
 
-                    if (Permisos::valorExiste('nombre_permiso', $permiso->nombre_permiso, $permiso->id_permiso, 'id_permiso')) {
-                        return 'El nombre del permiso ya está en uso por otro permiso';
+                    // Validar que usuario exista
+                    $sql    = "SELECT COUNT(*) FROM usuarios 
+                                WHERE id_usuario = ? AND situacion = 1";
+                    $exists = Permisos::fetchScalar($sql, [$permiso->id_usuario]);
+                    if ($exists == 0) {
+                        return 'El usuario seleccionado no existe o está inactivo';
+                    }
+
+                    // Validar que rol exista
+                    $sql    = "SELECT COUNT(*) FROM roles 
+                                WHERE id_rol = ? AND situacion = 1";
+                    $exists = Permisos::fetchScalar($sql, [$permiso->id_rol]);
+                    if ($exists == 0) {
+                        return 'El rol seleccionado no existe o está inactivo';
                     }
 
                     return true;
@@ -179,14 +230,49 @@ class PermisoController extends ActiveRecord
     {
         try {
             // Validar que llegue el ID
-            if (empty($_POST['id_permiso'])) {
-                self::respuestaJSON(0, 'ID de permiso requerido', null, 400);
+            if (empty($_POST['id_usuario_rol'])) {
+                self::respuestaJSON(0, 'ID de asignación requerido', null, 400);
             }
 
             // Usamos el helper lógico para eliminar el permiso
-            Permisos::eliminarLogicoConRespuesta($_POST['id_permiso'], 'id_permiso');
+            Permisos::eliminarLogicoConRespuesta($_POST['id_usuario_rol'], 'id_usuario_rol');
         } catch (Exception $e) {
             self::respuestaJSON(0, 'Error al eliminar permiso: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    // Para cargar datos en selects
+    public static function obtenerUsuarios()
+    {
+        try {
+            $sql = "SELECT id_usuario, 
+                    (nombre1 || ' ' || NVL(apellido1, '')) AS nombre_completo, 
+                    correo 
+                FROM usuarios 
+                WHERE situacion = 1 
+                ORDER BY nombre1, apellido1";
+
+            // Usamos fetchArray para obtener arrays
+            $usuarios = Permisos::fetchArray($sql);
+            self::respuestaJSON(1, 'Usuarios encontrados', $usuarios);
+        } catch (Exception $e) {
+            self::respuestaJSON(0, 'Error al obtener usuarios: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+
+    public static function obtenerRoles()
+    {
+        try {
+            $sql = "SELECT id_rol, rol_nombre, descripcion 
+                    FROM roles 
+                    WHERE situacion = 1 
+                    ORDER BY rol_nombre";
+
+            $roles = Permisos::fetchArray($sql);
+            self::respuestaJSON(1, 'Roles encontrados', $roles);
+        } catch (Exception $e) {
+            self::respuestaJSON(0, 'Error al obtener roles: ' . $e->getMessage(), null, 500);
         }
     }
 }

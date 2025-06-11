@@ -5,45 +5,45 @@
             <div class="card-header bg-primary text-white text-center">
                 <h4 class="mb-0">
                     <i class="bi bi-shield-lock me-2"></i>
-                    <span id="tituloFormulario">Registrar Permiso</span>
+                    <span id="tituloFormulario">Asignar Rol a Usuario</span>
                 </h4>
             </div>
             <div class="card-body p-3">
                 <div class="row mb-3">
-                    <h5 class="text-center mb-2">¡Bienvenido a la Aplicación para el registro, modificación y eliminación de permisos!</h5>
-                    <h4 class="text-center mb-2 text-primary">Manipulación de permisos</h4>
+                    <h5 class="text-center mb-2">¡Gestión de Asignación de Roles a Usuarios!</h5>
+                    <h4 class="text-center mb-2 text-primary">Asignación Usuario-Rol</h4>
                 </div>
 
                 <div class="row justify-content-center p-5 shadow-lg">
                     <form id="FormPermisos">
-                        <input type="hidden" id="id_permiso" name="id_permiso">
+                        <input type="hidden" id="id_usuario_rol" name="id_usuario_rol">
 
-                        <!-- Aplicación (SELECT con llave foránea) -->
+                        <!-- USUARIO (SELECT) -->
                         <div class="row mb-3 justify-content-center">
                             <div class="col-lg-6">
-                                <label for="id_app" class="form-label">Aplicación</label>
-                                <select class="form-select" id="id_app" name="id_app" required>
-                                    <option value="">-- Selecciona una aplicación --</option>
+                                <label for="id_usuario" class="form-label">Usuario</label>
+                                <select class="form-select" id="id_usuario" name="id_usuario" required>
+                                    <option value="">-- Selecciona un usuario --</option>
+                                    <!-- Se carga dinámicamente -->
+                                </select>
+                            </div>
+
+                            <!-- ROL (SELECT) -->
+                            <div class="col-lg-6">
+                                <label for="id_rol" class="form-label">Rol</label>
+                                <select class="form-select" id="id_rol" name="id_rol" required>
+                                    <option value="">-- Selecciona un rol --</option>
                                     <!-- Se carga dinámicamente -->
                                 </select>
                             </div>
                         </div>
 
+                        <!-- DESCRIPCIÓN -->
                         <div class="row mb-3 justify-content-center">
-                            <div class="col-lg-6">
-                                <label for="nombre_permiso" class="form-label">Nombre del Permiso</label>
-                                <input type="text" class="form-control" id="nombre_permiso" name="nombre_permiso" placeholder="Ingrese el nombre del permiso">
-                            </div>
-                            <div class="col-lg-6">
-                                <label for="clave_permiso" class="form-label">Clave del Permiso</label>
-                                <input type="text" class="form-control text-uppercase" id="clave_permiso" name="clave_permiso" placeholder="Ingrese la clave del permiso">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3 justify-content-center mb-3">
                             <div class="col-lg-12">
                                 <label for="descripcion" class="form-label">Descripción</label>
-                                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" placeholder="Describe las funcionalidades de este permiso..."></textarea>
+                                <textarea class="form-control" id="descripcion" name="descripcion" rows="3"
+                                    placeholder="Describe la asignación de este rol al usuario..."></textarea>
                             </div>
                         </div>
                     </form>
@@ -67,7 +67,7 @@
                     <!-- NUEVO BOTÓN PARA VER PERMISOS -->
                     <div class="col-auto">
                         <button type="button" id="BtnVerPermisos" class="btn btn-info">
-                            <i class="bi bi-shield-fill me-1"></i> Ver Permisos Registrados
+                            <i class="bi bi-people-fill me-1"></i> Ver Asignaciones
                         </button>
                     </div>
                 </div>

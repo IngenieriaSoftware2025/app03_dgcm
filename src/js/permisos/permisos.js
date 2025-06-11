@@ -6,17 +6,16 @@ import { lenguaje } from "../lenguaje";
 
 console.log('=== CARGANDO MÓDULO DE PERMISOS ===');
 
-// CONSTANTES DEL FORMULARIO ESPECÍFICAS DE PERMISOS
+// CONSTANTES USUARIO_ROL
 const FormPermisos = document.getElementById('FormPermisos');
 const BtnGuardar = document.getElementById('BtnGuardar');
 const BtnModificar = document.getElementById('BtnModificar');
 const BtnLimpiar = document.getElementById('BtnLimpiar');
 
-// CAMPOS ESPECÍFICOS DE PERMISOS
-const selectAplicacion = document.getElementById('id_app');
-const nombrePermiso = document.getElementById('nombre_permiso');
-const clavePermiso = document.getElementById('clave_permiso');
-const descripcionPermiso = document.getElementById('descripcion');
+// CAMPOS ESPECÍFICOS DE USUARIO_ROL
+const selectUsuario = document.getElementById('id_usuario');
+const selectRol = document.getElementById('id_rol');
+const descripcionAsignacion = document.getElementById('descripcion');
 
 // BOTONES DE ACCIÓN
 const BtnVerPermisos = document.getElementById('BtnVerPermisos');
@@ -29,12 +28,11 @@ const seccionTabla = document.getElementById('seccionTabla');
 const tituloFormulario = document.getElementById('tituloFormulario');
 
 // FUNCIONES PARA CAMBIAR VISTAS
-const mostrarFormulario = (titulo = 'Registrar Permiso') => {
+const mostrarFormulario = (titulo = 'Asignar Rol a Usuario') => {
     seccionFormulario.classList.remove('d-none');
     seccionTabla.classList.add('d-none');
     tituloFormulario.textContent = titulo;
 
-    // Scroll al formulario
     seccionFormulario.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
@@ -45,24 +43,20 @@ const mostrarTabla = () => {
     seccionFormulario.classList.add('d-none');
     seccionTabla.classList.remove('d-none');
 
-    // Actualizar datos automáticamente
     buscaPermiso();
 
-    // Scroll a la tabla
     seccionTabla.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
     });
 }
 
-// VALIDACIONES ESPECÍFICAS DE PERMISOS
-
-// Validación de nombre del permiso
-const validacionNombrePermiso = () => {
-    const texto = nombrePermiso.value.trim();
+// VALIDACIÓN DE DESCRIPCIÓN ADAPTADA
+const validacionDescripcion = () => {
+    const texto = descripcionAsignacion.value.trim();
 
     if (texto.length < 1) {
-        nombrePermiso.classList.remove('is-valid', 'is-invalid');
+        descripcionAsignacion.classList.remove('is-valid', 'is-invalid');
         return;
     }
 
@@ -70,137 +64,89 @@ const validacionNombrePermiso = () => {
         Swal.fire({
             position: "center",
             icon: "warning",
-            title: "Nombre muy corto",
-            text: "El nombre del permiso debe tener al menos 5 caracteres",
+            title: "Descripción muy corta",
+            text: "La descripción debe tener al menos 5 caracteres",
             showConfirmButton: false,
             timer: 1500
         });
-        nombrePermiso.classList.remove('is-valid');
-        nombrePermiso.classList.add('is-invalid');
+        descripcionAsignacion.classList.remove('is-valid');
+        descripcionAsignacion.classList.add('is-invalid');
     } else if (texto.length > 255) {
         Swal.fire({
             position: "center",
             icon: "warning",
-            title: "Nombre muy largo",
-            text: "El nombre del permiso no puede exceder 255 caracteres",
-            showConfirmButton: false,
-            timer: 1500
-        });
-        nombrePermiso.classList.remove('is-valid');
-        nombrePermiso.classList.add('is-invalid');
-    } else {
-        nombrePermiso.classList.remove('is-invalid');
-        nombrePermiso.classList.add('is-valid');
-    }
-}
-
-// Validación de clave del permiso
-const validacionClavePermiso = () => {
-    const texto = clavePermiso.value.trim().toUpperCase();
-    clavePermiso.value = texto; // Forzar mayúsculas
-
-    if (texto.length < 1) {
-        clavePermiso.classList.remove('is-valid', 'is-invalid');
-        return;
-    }
-
-    if (texto.length < 2) {
-        Swal.fire({
-            position: "center",
-            icon: "warning",
-            title: "Clave muy corta",
-            text: "La clave del permiso debe tener al menos 2 caracteres",
-            showConfirmButton: false,
-            timer: 1500
-        });
-        clavePermiso.classList.remove('is-valid');
-        clavePermiso.classList.add('is-invalid');
-    } else if (texto.length > 100) {
-        Swal.fire({
-            position: "center",
-            icon: "warning",
-            title: "Clave muy larga",
-            text: "La clave del permiso no puede exceder 100 caracteres",
-            showConfirmButton: false,
-            timer: 1500
-        });
-        clavePermiso.classList.remove('is-valid');
-        clavePermiso.classList.add('is-invalid');
-    } else {
-        clavePermiso.classList.remove('is-invalid');
-        clavePermiso.classList.add('is-valid');
-    }
-}
-
-// Validación de descripción
-const validacionDescripcion = () => {
-    const texto = descripcionPermiso.value.trim();
-
-    if (texto.length < 1) {
-        descripcionPermiso.classList.remove('is-valid', 'is-invalid');
-        return;
-    }
-
-    if (texto.length < 10) {
-        Swal.fire({
-            position: "center",
-            icon: "warning",
-            title: "Descripción muy corta",
-            text: "La descripción debe tener al menos 10 caracteres",
-            showConfirmButton: false,
-            timer: 1500
-        });
-        descripcionPermiso.classList.remove('is-valid');
-        descripcionPermiso.classList.add('is-invalid');
-    } else if (texto.length > 1000) {
-        Swal.fire({
-            position: "center",
-            icon: "warning",
             title: "Descripción muy larga",
-            text: "La descripción no puede exceder 1000 caracteres",
+            text: "La descripción no puede exceder 255 caracteres",
             showConfirmButton: false,
             timer: 1500
         });
-        descripcionPermiso.classList.remove('is-valid');
-        descripcionPermiso.classList.add('is-invalid');
+        descripcionAsignacion.classList.remove('is-valid');
+        descripcionAsignacion.classList.add('is-invalid');
     } else {
-        descripcionPermiso.classList.remove('is-invalid');
-        descripcionPermiso.classList.add('is-valid');
+        descripcionAsignacion.classList.remove('is-invalid');
+        descripcionAsignacion.classList.add('is-valid');
     }
 }
 
-// CARGAR APLICACIONES EN EL SELECT (FK)
-const cargarAplicaciones = async () => {
+// CARGAR USUARIOS EN EL SELECT
+const cargarUsuarios = async () => {
     try {
-        const respuesta = await fetch('/app03_dgcm/busca_aplicacion');
+        const respuesta = await fetch('/app03_dgcm/obtener_usuarios');
         const datos = await respuesta.json();
 
         if (datos.codigo === 1 && datos.data) {
-            // Limpiar opciones anteriores (excepto la primera)
-            selectAplicacion.innerHTML = '<option value="">-- Selecciona una aplicación --</option>';
+            selectUsuario.innerHTML = '<option value="">-- Selecciona un usuario --</option>';
 
-            // Agregar aplicaciones al select
-            datos.data.forEach(app => {
+            datos.data.forEach(usuario => {
                 const option = document.createElement('option');
-                option.value = app.id_app;
-                option.textContent = `${app.nombre_app_ct} - ${app.nombre_app_md}`;
-                selectAplicacion.appendChild(option);
+                option.value = usuario.id_usuario;
+                option.textContent = `${usuario.nombre_completo} (${usuario.correo})`;
+                selectUsuario.appendChild(option);
             });
         }
     } catch (error) {
-        console.error('Error cargando aplicaciones:', error);
+        console.error('Error cargando usuarios:', error);
         Swal.fire({
             position: "center",
             icon: "error",
             title: "Error",
-            text: "No se pudieron cargar las aplicaciones",
+            text: "No se pudieron cargar los usuarios",
             showConfirmButton: false,
             timer: 2000
         });
     }
 }
 
-// DATATABLE PARA PERMISOS
+// CARGAR ROLES EN EL SELECT
+const cargarRoles = async () => {
+    try {
+        const respuesta = await fetch('/app03_dgcm/obtener_roles');
+        const datos = await respuesta.json();
+
+        if (datos.codigo === 1 && datos.data) {
+            selectRol.innerHTML = '<option value="">-- Selecciona un rol --</option>';
+
+            datos.data.forEach(rol => {
+                const option = document.createElement('option');
+                option.value = rol.id_rol;
+                option.textContent = `${rol.rol_nombre} - ${rol.descripcion}`;
+                selectRol.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando roles:', error);
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error",
+            text: "No se pudieron cargar los roles",
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
+}
+
+// DATATABLE ADAPTADO PARA USUARIO_ROL
 const datosDeTabla = new DataTable('#TablePermisos', {
     dom: `
         <"row mt-3 justify-content-between"
@@ -219,30 +165,26 @@ const datosDeTabla = new DataTable('#TablePermisos', {
     columns: [
         {
             title: 'N°',
-            data: 'id_permiso',
+            data: 'id_usuario_rol',
             width: '5%',
             render: (data, type, row, meta) => meta.row + 1
         },
         {
-            title: 'Aplicación',
-            data: 'aplicacion_siglas',
-            width: '15%',
+            title: 'Usuario',
+            data: 'usuario_nombre',
+            width: '25%',
             render: (data, type, row) => {
-                return `<span class="badge bg-primary fs-6">${data}</span><br>
-                        <small class="text-muted">${row.aplicacion_nombre}</small>`;
+                return `<strong>${row.usuario_nombre || ''} ${row.usuario_apellido || ''}</strong><br>
+                <small class="text-muted">${row.usuario_correo || ''}</small>`;
             }
         },
         {
-            title: 'Nombre del Permiso',
-            data: 'nombre_permiso',
-            width: '25%'
-        },
-        {
-            title: 'Clave',
-            data: 'clave_permiso',
-            width: '15%',
+            title: 'Rol Asignado',
+            data: 'rol_nombre',
+            width: '20%',
             render: (data, type, row) => {
-                return `<code class="bg-secondary text-white p-1 rounded">${data}</code>`;
+                return `<span class="badge bg-primary fs-6">${row.rol_nombre || ''}</span><br>
+                <small class="text-muted">${row.rol_descripcion || ''}</small>`;
             }
         },
         {
@@ -250,12 +192,24 @@ const datosDeTabla = new DataTable('#TablePermisos', {
             data: 'descripcion',
             width: '30%',
             render: (data, type, row) => {
-                return data.length > 50 ? data.substring(0, 50) + '...' : data;
+                return data && data.length > 50 ? data.substring(0, 50) + '...' : (data || 'Sin descripción');
+            }
+        },
+        {
+            title: 'Fecha Asignación',
+            data: 'fecha_creacion',
+            width: '10%',
+            render: (data, type, row) => {
+                if (data) {
+                    const fecha = new Date(data);
+                    return fecha.toLocaleDateString('es-ES');
+                }
+                return '--';
             }
         },
         {
             title: 'Opciones',
-            data: 'id_permiso',
+            data: 'id_usuario_rol',
             searchable: false,
             orderable: false,
             width: '10%',
@@ -264,16 +218,17 @@ const datosDeTabla = new DataTable('#TablePermisos', {
                 <div class='d-flex justify-content-center'>
                     <button class='btn btn-warning btn-sm modificar mx-1' 
                         data-id="${data}" 
-                        data-id_app="${row.id_app}"
-                        data-nombre_permiso="${row.nombre_permiso}"  
-                        data-clave_permiso="${row.clave_permiso}"
-                        data-descripcion="${row.descripcion}"
-                        title="Modificar permiso">
+                        data-id_usuario="${row.id_usuario}"
+                        data-id_rol="${row.id_rol}"  
+                        data-descripcion="${row.descripcion || ''}"
+                        title="Modificar asignación">
                         <i class='bi bi-pencil-square'></i>
                     </button>
                     <button class='btn btn-danger btn-sm eliminar mx-1' 
                         data-id="${data}"
-                        title="Eliminar permiso">
+                        data-usuario="${row.usuario_nombre} ${row.usuario_apellido}"
+                        data-rol="${row.rol_nombre}"
+                        title="Eliminar asignación">
                         <i class="bi bi-trash3"></i>
                     </button>
                 </div>
@@ -283,13 +238,13 @@ const datosDeTabla = new DataTable('#TablePermisos', {
     ],
 });
 
-// GUARDAR PERMISO
+// GUARDAR ASIGNACIÓN 
 const guardaPermiso = async (e) => {
     e.preventDefault();
     BtnGuardar.disabled = true;
 
-    // Validar formulario (excluyendo id_permiso)
-    if (!validarFormulario(FormPermisos, ['id_permiso'])) {
+    // Validar formulario (excluyendo id_usuario_rol)
+    if (!validarFormulario(FormPermisos, ['id_usuario_rol'])) {
         Swal.fire({
             position: "center",
             icon: "warning",
@@ -302,9 +257,7 @@ const guardaPermiso = async (e) => {
         return;
     }
 
-    // Validaciones específicas
-    validacionNombrePermiso();
-    validacionClavePermiso();
+    // Validación específica
     validacionDescripcion();
 
     // Verificar si hay errores de validación
@@ -323,7 +276,7 @@ const guardaPermiso = async (e) => {
     }
 
     const body = new FormData(FormPermisos);
-    console.log('=== DATOS DE PERMISO QUE SE ENVÍAN ===');
+    console.log('=== DATOS DE ASIGNACIÓN QUE SE ENVÍAN ===');
     for (let [key, value] of body.entries()) {
         console.log(`${key}: ${value}`);
     }
@@ -336,18 +289,13 @@ const guardaPermiso = async (e) => {
 
     try {
         const respuesta = await fetch(url, config);
-        console.log('=== RESPUESTA DEL SERVIDOR ===');
-        console.log('Status:', respuesta.status);
-        console.log('StatusText:', respuesta.statusText);
-
         const datos = await respuesta.json();
-        console.log('Datos recibidos:', datos);
 
         if (datos.codigo === 1) {
             Swal.fire({
                 position: "center",
                 icon: "success",
-                title: "¡Permiso registrado!",
+                title: "¡Rol asignado correctamente!",
                 text: datos.mensaje,
                 showConfirmButton: false,
                 timer: 1500
@@ -357,11 +305,11 @@ const guardaPermiso = async (e) => {
 
             setTimeout(async () => {
                 const resultado = await Swal.fire({
-                    title: '¿Desea ver los permisos registrados?',
+                    title: '¿Desea ver las asignaciones registradas?',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Sí, ver permisos',
-                    cancelButtonText: 'Seguir registrando'
+                    confirmButtonText: 'Sí, ver asignaciones',
+                    cancelButtonText: 'Seguir asignando'
                 });
 
                 if (resultado.isConfirmed) {
@@ -395,7 +343,7 @@ const guardaPermiso = async (e) => {
     BtnGuardar.disabled = false;
 }
 
-// BUSCAR PERMISOS
+// BUSCAR ASIGNACIONES 
 const buscaPermiso = async () => {
     const url = '/app03_dgcm/busca_permiso';
     const config = {
@@ -405,13 +353,11 @@ const buscaPermiso = async () => {
     try {
         const respuesta = await fetch(url, config);
 
-        // Verificar si la respuesta es OK
         if (!respuesta.ok) {
             console.error('Error HTTP:', respuesta.status, respuesta.statusText);
             return;
         }
 
-        // Verificar si es JSON válido
         const textoRespuesta = await respuesta.text();
         console.log('Respuesta cruda del servidor:', textoRespuesta);
 
@@ -420,11 +366,8 @@ const buscaPermiso = async () => {
             datos = JSON.parse(textoRespuesta);
         } catch (errorJSON) {
             console.error('Error parseando JSON:', errorJSON);
-            console.error('Respuesta del servidor:', textoRespuesta);
             return;
         }
-
-        console.log('Datos parseados:', datos);
 
         if (datos.codigo === 1) {
             datosDeTabla.clear().draw();
@@ -440,17 +383,17 @@ const buscaPermiso = async () => {
     }
 }
 
-// LLENAR FORMULARIO PARA MODIFICAR
+// LLENAR FORMULARIO PARA MODIFICAR 
 const llenarFormulario = async (e) => {
     const datos = e.currentTarget.dataset;
 
-    // Cargar aplicaciones primero
-    await cargarAplicaciones();
+    // Cargar usuarios y roles primero
+    await cargarUsuarios();
+    await cargarRoles();
 
-    document.getElementById('id_permiso').value = datos.id;
-    document.getElementById('id_app').value = datos.id_app;
-    document.getElementById('nombre_permiso').value = datos.nombre_permiso;
-    document.getElementById('clave_permiso').value = datos.clave_permiso;
+    document.getElementById('id_usuario_rol').value = datos.id;
+    document.getElementById('id_usuario').value = datos.id_usuario;
+    document.getElementById('id_rol').value = datos.id_rol;
     document.getElementById('descripcion').value = datos.descripcion;
 
     // Limpiar validaciones previas
@@ -462,14 +405,13 @@ const llenarFormulario = async (e) => {
     BtnGuardar.classList.add('d-none');
     BtnModificar.classList.remove('d-none');
 
-    mostrarFormulario('Modificar Permiso');
+    mostrarFormulario('Modificar Asignación');
 }
 
 // LIMPIAR FORMULARIO
 const limpiarFormulario = () => {
     FormPermisos.reset();
 
-    // Limpiar validaciones
     const inputs = FormPermisos.querySelectorAll('.form-control, .form-select');
     inputs.forEach(input => {
         input.classList.remove('is-valid', 'is-invalid');
@@ -478,16 +420,14 @@ const limpiarFormulario = () => {
     BtnGuardar.classList.remove('d-none');
     BtnModificar.classList.add('d-none');
 
-    // Cambiar título cuando se limpie
-    tituloFormulario.textContent = 'Registrar Permiso';
+    tituloFormulario.textContent = 'Asignar Rol a Usuario';
 }
 
-// MODIFICAR PERMISO
+// MODIFICAR ASIGNACIÓN
 const modificaPermiso = async (e) => {
     e.preventDefault();
     BtnModificar.disabled = true;
 
-    // Validar formulario
     if (!validarFormulario(FormPermisos, [])) {
         Swal.fire({
             position: "center",
@@ -501,12 +441,8 @@ const modificaPermiso = async (e) => {
         return;
     }
 
-    // Validaciones específicas
-    validacionNombrePermiso();
-    validacionClavePermiso();
     validacionDescripcion();
 
-    // Verificar si hay errores de validación
     const errores = FormPermisos.querySelectorAll('.is-invalid');
     if (errores.length > 0) {
         Swal.fire({
@@ -536,7 +472,7 @@ const modificaPermiso = async (e) => {
             Swal.fire({
                 position: "center",
                 icon: "success",
-                title: "¡Permiso actualizado!",
+                title: "¡Asignación actualizada!",
                 text: datos.mensaje,
                 showConfirmButton: false,
                 timer: 1500
@@ -572,15 +508,17 @@ const modificaPermiso = async (e) => {
     BtnModificar.disabled = false;
 }
 
-// ELIMINAR PERMISO
+// ELIMINAR ASIGNACIÓN 
 const eliminaPermiso = async (e) => {
-    const idPermiso = e.currentTarget.dataset.id;
+    const idAsignacion = e.currentTarget.dataset.id;
+    const usuario = e.currentTarget.dataset.usuario;
+    const rol = e.currentTarget.dataset.rol;
 
     const alertaConfirmaEliminar = await Swal.fire({
         position: "center",
         icon: "question",
         title: "¿Estás seguro?",
-        text: "El permiso será eliminado del sistema",
+        html: `Se eliminará la asignación del rol:<br><strong>${rol}</strong><br>al usuario:<br><strong>${usuario}</strong>`,
         showConfirmButton: true,
         confirmButtonText: "Sí, eliminar",
         confirmButtonColor: "#d33",
@@ -591,7 +529,7 @@ const eliminaPermiso = async (e) => {
     if (!alertaConfirmaEliminar.isConfirmed) return;
 
     const body = new FormData();
-    body.append('id_permiso', idPermiso);
+    body.append('id_usuario_rol', idAsignacion);
 
     try {
         const respuesta = await fetch('/app03_dgcm/elimina_permiso', {
@@ -634,13 +572,8 @@ const eliminaPermiso = async (e) => {
     }
 };
 
-// EVENTOS DE VALIDACIÓN
-nombrePermiso.addEventListener('blur', validacionNombrePermiso);
-clavePermiso.addEventListener('blur', validacionClavePermiso);
-clavePermiso.addEventListener('input', (e) => {
-    e.target.value = e.target.value.toUpperCase(); // Forzar mayúsculas en tiempo real
-});
-descripcionPermiso.addEventListener('blur', validacionDescripcion);
+// EVENTOS 
+descripcionAsignacion.addEventListener('blur', validacionDescripcion);
 
 // EVENTOS DEL FORMULARIO
 FormPermisos.addEventListener('submit', guardaPermiso);
@@ -655,9 +588,10 @@ BtnVerPermisos.addEventListener('click', () => {
 });
 
 BtnCrearPermiso.addEventListener('click', async () => {
-    await cargarAplicaciones(); // Cargar aplicaciones al crear nuevo
+    await cargarUsuarios();
+    await cargarRoles();
     limpiarFormulario();
-    mostrarFormulario('Registrar Permiso');
+    mostrarFormulario('Asignar Rol a Usuario');
 });
 
 BtnActualizarTabla.addEventListener('click', () => {
@@ -675,8 +609,9 @@ BtnActualizarTabla.addEventListener('click', () => {
 datosDeTabla.on('click', '.modificar', llenarFormulario);
 datosDeTabla.on('click', '.eliminar', eliminaPermiso);
 
-// INICIALIZAR AL CARGAR LA PÁGINA
+// INICIALIZAR AL CARGAR LA PÁGINA 
 document.addEventListener('DOMContentLoaded', async () => {
-    await cargarAplicaciones(); // Cargar aplicaciones al inicio
-    mostrarFormulario('Registrar Permiso');
+    await cargarUsuarios();
+    await cargarRoles();
+    mostrarFormulario('Asignar Rol a Usuario');
 });

@@ -246,7 +246,7 @@ const guardaUsuario = async (e) => {
     e.preventDefault();
     BtnGuardar.disabled = true;
 
-    if (!validarFormulario(FormRegistro, ['id_usuario', 'nombre2', 'apellido2', 'dpi', 'fotografia'])) {
+    if (!validarFormulario(FormRegistro, ['id_usuario', 'nombre2', 'apellido2', 'dpi', 'fotografia', 'rol'])) {
         Swal.fire({
             position: "center",
             icon: "warning",
@@ -460,7 +460,7 @@ const modificaUsuario = async (e) => {
     e.preventDefault();
     BtnModificar.disabled = true;
 
-    if (!validarFormulario(FormRegistro, ['nombre2', 'apellido2', 'dpi', 'usuario_clave', 'confirmar_clave', 'fotografia'])) {
+    if (!validarFormulario(FormRegistro, ['nombre2', 'apellido2', 'dpi', 'usuario_clave', 'confirmar_clave', 'fotografia', 'rol'])) {
         Swal.fire({
             position: "center",
             icon: "warning",

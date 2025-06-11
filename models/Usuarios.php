@@ -25,7 +25,8 @@ class Usuarios extends ActiveRecord
         'fecha_creacion',
         'fecha_clave',
         'fotografia',
-        'situacion'
+        'situacion',
+        'rol'
     ];
 
     // Crea las variables para almacenar los datos
@@ -43,6 +44,7 @@ class Usuarios extends ActiveRecord
     public $fecha_clave;
     public $fotografia;
     public $situacion;
+    public $rol;
 
     public function __construct($usuario = [])
     {
@@ -60,6 +62,7 @@ class Usuarios extends ActiveRecord
         $this->fecha_clave = $usuario['fecha_clave'] ?? null;
         $this->fotografia = $usuario['fotografia'] ?? '';
         $this->situacion = $usuario['situacion'] ?? 1;
+        $this->rol = $usuario['rol'] ?? 'cliente';
     }
 
     public function atributos()

@@ -11,21 +11,27 @@ CREATE TABLE roles
 CREATE TABLE usuarios
 (
     id_usuario SERIAL PRIMARY KEY,
-    nombre1 VARCHAR(70)NOT NULL,
+    nombre1 VARCHAR(70) NOT NULL,
     nombre2 VARCHAR(70),
     apellido1 VARCHAR(70) NOT NULL,
     apellido2 VARCHAR(70),
     telefono BIGINT,
     dpi BIGINT,
     correo VARCHAR(100) NOT NULL UNIQUE,
-    usuario_clave lVARCHAR(1056) NOT NULL,
-    token lVARCHAR(1056),
+    usuario_clave VARCHAR(150) NOT NULL,
+    token VARCHAR(150),
     fecha_creacion DATETIME
     YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
-    fecha_clave DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
-    fotografia lVARCHAR
-    (2056),
-    situacion SMALLINT  DEFAULT 1
+    fecha_clave    DATETIME      YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    fotografia     VARCHAR
+    (255),
+    situacion      SMALLINT      DEFAULT 1 CHECK
+    (situacion IN
+    (0,1)),
+    rol VARCHAR
+    (20) DEFAULT 'cliente' CHECK
+    (rol IN
+    ('cliente','empleado','administrador'))
 );
 
     CREATE TABLE usuario_rol
@@ -43,8 +49,8 @@ CREATE TABLE usuarios
 
         ALTER TABLE usuario_rol ADD CONSTRAINT FOREIGN KEY
         (id_usuario) 
-REFERENCES usuarios CONSTRAINT fk_usuario_rol_usuarios;
+    REFERENCES usuarios CONSTRAINT fk_usuario_rol_usuarios;
 
         ALTER TABLE usuario_rol ADD CONSTRAINT FOREIGN KEY
         (id_rol) 
-REFERENCES roles CONSTRAINT fk_usuario_rol_roles;
+    REFERENCES roles CONSTRAINT fk_usuario_rol_roles;
