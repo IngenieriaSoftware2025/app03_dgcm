@@ -16,6 +16,11 @@ class ActiveRecord
     protected static $idTabla = ['id'];
     protected static $id = 'id';
 
+    // Codificación de caracteres
+    // ISO-8859-1 para la BD y UTF-8 para la aplicación
+    protected static $encodingDB  = 'ISO-8859-1';
+    protected static $encodingApp = 'UTF-8';
+
     // Alertas y Mensajes
     protected static $alertas = [];
 
@@ -39,6 +44,18 @@ class ActiveRecord
     {
         static::$alertas = [];
         return static::$alertas;
+    }
+
+    /** Convierte una cadena UTF-8 de la app a la codificación de la BD */
+    protected function convertirParaDB(string $texto): string
+    {
+        return mb_convert_encoding($texto, self::$encodingDB, self::$encodingApp);
+    }
+
+    /** Convierte una cadena ISO-8859-1 de la BD a UTF-8 de la app */
+    protected function convertirDesdeBD(string $texto): string
+    {
+        return mb_convert_encoding($texto, self::$encodingApp, self::$encodingDB);
     }
 
     // Registros - CRUD
@@ -96,11 +113,10 @@ class ActiveRecord
             }
         }
 
-        // DEBUGGING: Ver la query
-        error_log("Query find(): " . $query);
-
         $resultado = self::consultarSQL($query);
-        return array_shift($resultado);
+
+        $objeto = array_shift($resultado);
+        return $objeto instanceof static ? $objeto : null;
     }
 
 
@@ -140,15 +156,17 @@ class ActiveRecord
         });
 
         $columnas = array_keys($atributos);
-        $valores = array_values($atributos);
+
+        $valores = array_map(function ($v) {
+            return is_string($v)
+                ? $this->convertirParaDB($v)
+                : $v;
+        }, array_values($atributos));
+
         // Crear placeholders para prepared statement
         $placeholders = str_repeat('?,', count($valores) - 1) . '?';
 
         $query = "INSERT INTO " . static::$tabla . " (" . join(', ', $columnas) . ") VALUES (" . $placeholders . ")";
-
-        // DEBUGGING
-        error_log("Query: " . $query);
-        error_log("Valores: " . print_r($valores, true));
 
         try {
             $stmt = self::$db->prepare($query);
@@ -167,7 +185,11 @@ class ActiveRecord
     public function actualizar()
     {
         // Sanitizar los datos
-        $atributos = $this->sanitizarAtributos();
+        $atributos = array_map(function ($v) {
+            return is_string($v)
+                ? $this->convertirParaDB($v)
+                : $v;
+        }, $this->sanitizarAtributos());
 
         // Iterar para ir agregando cada campo de la BD
         $valores = [];
@@ -252,7 +274,8 @@ class ActiveRecord
             foreach ($respuesta as $value) {
                 // Usar mb_convert_encoding en lugar de utf8_encode deprecated
                 $data[] = array_change_key_case(array_map(function ($item) {
-                    return mb_convert_encoding($item ?? '', 'UTF-8', 'auto');
+                    // forzamos desde ISO-8859-1 a UTF-8
+                    return mb_convert_encoding($item ?? '', 'UTF-8', 'ISO-8859-1');
                 }, $value));
             }
 
@@ -292,18 +315,26 @@ class ActiveRecord
         }
     }
 
-    protected static function crearObjeto($registro)
+    protected static function crearObjeto(array $registro)
     {
         $objeto = new static;
-
         foreach ($registro as $key => $value) {
             $key = strtolower($key);
             if (property_exists($objeto, $key)) {
-                // Usar mb_convert_encoding en lugar de utf8_encode deprecated
-                $objeto->$key = mb_convert_encoding($value ?? '', 'UTF-8', 'auto');
+                // Si viene como string, lo convertimos de ISO-8859-1 a UTF-8
+                if (is_string($value)) {
+                    $value = $objeto->convertirDesdeBD($value);
+                }
+                // Detecta y normaliza fechas Informix (MM-DD-YYYY HH:MM:SS AM/PM)
+                if (preg_match('/\d{2}-\d{2}-\d{4}/', $value)) {
+                    $dt = \DateTime::createFromFormat('m-d-Y h:i:s A', $value);
+                    if ($dt) {
+                        $value = $dt->format('Y-m-d H:i:s');
+                    }
+                }
+                $objeto->$key = $value;
             }
         }
-
         return $objeto;
     }
 

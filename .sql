@@ -28,30 +28,23 @@ CREATE TABLE usuarios
     situacion SMALLINT  DEFAULT 1
 );
 
-    CREATE TABLE aplicacion
+    CREATE TABLE usuario_rol
     (
-        id_app SERIAL PRIMARY KEY,
-        nombre_app_lg LVARCHAR(2056),
-        nombre_app_md LVARCHAR(1056),
-        nombre_app_ct LVARCHAR(255),
+        id_usuario_rol SERIAL PRIMARY KEY,
+        id_usuario INTEGER NOT NULL,
+        id_rol INTEGER NOT NULL,
+        descripcion VARCHAR(255),
         fecha_creacion DATETIME
         YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
-    situacion SMALLINT  DEFAULT 1
+    situacion   SMALLINT DEFAULT 1 CHECK
+        (situacion IN
+        (0,1))
 );
 
-        CREATE TABLE permisos
-        (
-            id_permiso SERIAL PRIMARY KEY,
-            id_app INT,
-            nombre_permiso VARCHAR(70) NOT NULL,
-            clave_permiso VARCHAR(70),
-            descripcion VARCHAR(255),
-            fecha_creacion DATETIME
-            YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
-    situacion SMALLINT  DEFAULT 1
-);
+        ALTER TABLE usuario_rol ADD CONSTRAINT FOREIGN KEY
+        (id_usuario) 
+REFERENCES usuarios CONSTRAINT fk_usuario_rol_usuarios;
 
-            ALTER TABLE permisos 
-    ADD CONSTRAINT FOREIGN KEY
-            (id_app) 
-    REFERENCES aplicacion CONSTRAINT fk_perm_aplicacion;
+        ALTER TABLE usuario_rol ADD CONSTRAINT FOREIGN KEY
+        (id_rol) 
+REFERENCES roles CONSTRAINT fk_usuario_rol_roles;

@@ -129,23 +129,23 @@ class RegistroController extends ActiveRecord
             $datos = self::sanitizarDatos($_POST);
 
             // PROCESAR NUEVA FOTOGRAFIA SI SE SUBIÓ
-           if (isset($_FILES['fotografia']) && !empty($_FILES['fotografia']['tmp_name'])) {
-            
-            // Eliminar imagen anterior si existe
-            if (!empty($usuario->fotografia)) {
-                self::eliminarImagen($usuario->fotografia);
+            if (isset($_FILES['fotografia']) && !empty($_FILES['fotografia']['tmp_name'])) {
+
+                // Eliminar imagen anterior si existe
+                if (!empty($usuario->fotografia)) {
+                    self::eliminarImagen($usuario->fotografia);
+                }
+
+                // Subir nueva imagen con DPI como nombre
+                $resultadoImagen = self::subirImagen($_FILES['fotografia'], 'usuarios', 2097152, $usuario->dpi);
+
+                if ($resultadoImagen['success']) {
+                    $usuario->fotografia = $resultadoImagen['ruta'];
+                } else {
+                    self::respuestaJSON(0, $resultadoImagen['mensaje'], null, 400);
+                    return;
+                }
             }
-            
-            // Subir nueva imagen con DPI como nombre
-            $resultadoImagen = self::subirImagen($_FILES['fotografia'], 'usuarios', 2097152, $usuario->dpi);
-            
-            if ($resultadoImagen['success']) {
-                $usuario->fotografia = $resultadoImagen['ruta'];
-            } else {
-                self::respuestaJSON(0, $resultadoImagen['mensaje'], null, 400);
-                return;
-            }
-        }
 
 
             // Actualizar propiedades
