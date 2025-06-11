@@ -9,14 +9,32 @@ use Model\ActiveRecord;
 
 class RolesController extends ActiveRecord
 {
+    protected static function initSession(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+    }
 
     public static function mostrarPagina(Router $router)
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            header('Location: /app03_dgcm/dashboard');
+            exit;
+        }
+
         $router->render('roles/roles', [], 'layout');
     }
 
     public static function guardarRol()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
         try {
             // Validar campos requeridos usando helper
             $validacion = self::validarRequeridos($_POST, [
@@ -63,12 +81,23 @@ class RolesController extends ActiveRecord
 
     public static function buscaRol()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
         // Usando el helper para buscar Roles activos
         Roles::buscarConRespuesta("situacion = 1", "rol_nombre, descripcion");
     }
 
     public static function modificaRol()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
         try {
 
             // Validar que llegue el ID
@@ -115,6 +144,12 @@ class RolesController extends ActiveRecord
 
     public static function eliminaRol()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
         try {
             if (empty($_POST['id_rol'])) {
                 self::respuestaJSON(0, 'ID de rol requerido', null, 400);

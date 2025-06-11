@@ -6,19 +6,26 @@ use MVC\Router;
 use Controllers\AppController;
 
 // Importa mis clases de Controladores
-use Controllers\ClienteController;
 use Controllers\RolesController;
 use Controllers\LoginController;
 use Controllers\RegistroController;
 use Controllers\AplicacionController;
 use Controllers\PermisoController;
+use Controllers\TiendaController;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
-
 $router->get('/', [AppController::class, 'index']);
 
-// Get en nuestro idioma significa obtener, osea obtiene la vista de la pagina y la muestra al cliente
+
+// RUTAS DE TIENDA (PÚBLICAS)
+$router->get('/tienda', [TiendaController::class, 'index']);
+$router->get('/tienda/categoria', [TiendaController::class, 'categoria']);
+$router->get('/tienda/ofertas', [TiendaController::class, 'ofertas']);
+$router->get('/tienda/carrito', [TiendaController::class, 'carrito']);
+$router->get('/tienda/contacto', [TiendaController::class, 'contacto']);
+
+// Rutas para roles
 $router->get('/roles', [RolesController::class, 'mostrarPagina']);
 $router->get('/busca_rol', [RolesController::class, 'buscaRol']);
 $router->post('/elimina_rol', [RolesController::class, 'eliminaRol']);
@@ -27,9 +34,8 @@ $router->post('/modifica_rol', [RolesController::class, 'modificaRol']);
 
 // Rutas para Login
 $router->get('/login', [LoginController::class, 'mostrarLogin']);
-$router->post('/login', [LoginController::class, 'procesarLogin']);
+$router->post('/procesar_login', [LoginController::class, 'procesarLogin']);
 $router->get('/logout', [LoginController::class, 'logout']);
-$router->get('/verificar_sesion', [LoginController::class, 'verificarSesion']);
 
 // Rutas para el registro de usuario
 $router->get('/registro', [RegistroController::class, 'mostrarPaginaRegistro']);

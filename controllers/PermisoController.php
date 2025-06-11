@@ -9,13 +9,32 @@ use Model\Permisos;
 
 class PermisoController extends ActiveRecord
 {
+
+    protected static function initSession(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+    }
+
     public static function mostrarPermisos(Router $router)
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            header('Location: /app03_dgcm/dashboard');
+            exit;
+        }
         $router->render('permisos/permisos', [], 'layout');
     }
 
     public static function guardarPermiso()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
         try {
             // Validar campos requeridos usando helper
             $validacion = self::validarRequeridos($_POST, [
@@ -113,6 +132,12 @@ class PermisoController extends ActiveRecord
 
     public static function buscaPermiso()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
         Permisos::buscarConMultiplesRelaciones(
             [
                 // Relación con usuarios
@@ -146,6 +171,12 @@ class PermisoController extends ActiveRecord
 
     public static function modificaPermiso()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
         try {
             // Validar que llegue el ID
             if (empty($_POST['id_usuario_rol'])) {
@@ -228,6 +259,12 @@ class PermisoController extends ActiveRecord
 
     public static function eliminaPermiso()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
         try {
             // Validar que llegue el ID
             if (empty($_POST['id_usuario_rol'])) {
@@ -244,6 +281,12 @@ class PermisoController extends ActiveRecord
     // Para cargar datos en selects
     public static function obtenerUsuarios()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
         try {
             $sql = "SELECT id_usuario, 
                     (nombre1 || ' ' || NVL(apellido1, '')) AS nombre_completo, 
@@ -263,6 +306,12 @@ class PermisoController extends ActiveRecord
 
     public static function obtenerRoles()
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
         try {
             $sql = "SELECT id_rol, rol_nombre, descripcion 
                     FROM roles 

@@ -9,24 +9,41 @@ use MVC\Router;
 
 class RegistroController extends ActiveRecord
 {
+
+    protected static function initSession(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+    }
+
     public static function mostrarPaginaRegistro(Router $router)
     {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            header('Location: /app03_dgcm/dashboard');
+            exit;
+        }
         $router->render('registro/index', [], 'layout');
     }
 
     public static function buscaUsuario()
     {
-        if ($_SESSION['user']['rol'] !== 'administrador') {
-            unset($_POST['rol']);
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
         }
-        // usando helper de ActiveRecord
+
         Usuarios::buscarConRespuesta("situacion = 1", "nombre1, apellido1");
     }
 
     public static function guardarUsuario()
     {
-        if ($_SESSION['user']['rol'] !== 'administrador') {
-            unset($_POST['rol']);
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
         }
 
         try {
@@ -120,8 +137,10 @@ class RegistroController extends ActiveRecord
 
     public static function modificaUsuario()
     {
-        if ($_SESSION['user']['rol'] !== 'administrador') {
-            unset($_POST['rol']);
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
         }
 
         try {
@@ -214,8 +233,10 @@ class RegistroController extends ActiveRecord
 
     public static function eliminaUsuario()
     {
-        if ($_SESSION['user']['rol'] !== 'administrador') {
-            unset($_POST['rol']);
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
         }
 
         try {
