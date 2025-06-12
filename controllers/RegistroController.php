@@ -21,10 +21,22 @@ class RegistroController extends ActiveRecord
     {
         self::initSession();
         if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
-            header('Location: /app03_dgcm/dashboard');
+            // Redirigir según el rol
+            $rol = $_SESSION['user']['rol'] ?? 'cliente';
+            switch ($rol) {
+                case 'empleado':
+                    header('Location: /app03_dgcm/empleado');
+                    break;
+                case 'cliente':
+                    header('Location: /app03_dgcm/tienda');
+                    break;
+                default:
+                    header('Location: /app03_dgcm/login');
+            }
             exit;
         }
-        $router->render('registro/index', [], 'layout');
+
+        $router->render('admin/usuarios/index', [], 'tienda_layout');
     }
 
     public static function buscaUsuario()
@@ -41,10 +53,10 @@ class RegistroController extends ActiveRecord
     public static function guardarUsuario()
     {
         self::initSession();
-        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
-            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
-            return;
-        }
+        // if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+        //     self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+        //     return;
+        // }
 
         try {
             // Validar campos requeridos usando helper
@@ -258,6 +270,133 @@ class RegistroController extends ActiveRecord
             Usuarios::eliminarLogicoConRespuesta($id, 'id_usuario');
         } catch (Exception $e) {
             self::respuestaJSON(0, 'Error al eliminar usuario: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public static function estadisticasUsuarios()
+    {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
+        try {
+            $sql = "
+                SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN rol = 'administrador' THEN 1 ELSE 0 END) as admins,
+                    SUM(CASE WHEN rol = 'empleado' THEN 1 ELSE 0 END) as empleados,
+                    SUM(CASE WHEN rol = 'cliente' THEN 1 ELSE 0 END) as clientes,
+                    SUM(CASE WHEN situacion = 1 THEN 1 ELSE 0 END) as activos,
+                    SUM(CASE WHEN situacion = 0 THEN 1 ELSE 0 END) as inactivos
+                FROM usuarios
+            ";
+            $stats = self::consultarSQL($sql)[0];
+            self::respuestaJSON(1, 'Estadísticas obtenidas exitosamente', $stats);
+        } catch (Exception $e) {
+            self::respuestaJSON(0, 'Error al obtener estadísticas: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public static function buscarConFiltros()
+    {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
+        try {
+            $condiciones = ["1=1"]; // Condición base
+            $parametros = [];
+
+            // Filtro por rol
+            if (!empty($_GET['rol'])) {
+                $condiciones[] = "rol = ?";
+                $parametros[] = $_GET['rol'];
+            }
+
+            // Filtro por estado
+            if (isset($_GET['situacion']) && $_GET['situacion'] !== '') {
+                $condiciones[] = "situacion = ?";
+                $parametros[] = $_GET['situacion'];
+            }
+
+            // Filtro por fecha desde
+            if (!empty($_GET['fecha_desde'])) {
+                $condiciones[] = "DATE(fecha_creacion) >= ?";
+                $parametros[] = $_GET['fecha_desde'];
+            }
+
+            // Filtro por fecha hasta
+            if (!empty($_GET['fecha_hasta'])) {
+                $condiciones[] = "DATE(fecha_creacion) <= ?";
+                $parametros[] = $_GET['fecha_hasta'];
+            }
+
+            // Filtro por búsqueda general
+            if (!empty($_GET['buscar'])) {
+                $buscar = '%' . $_GET['buscar'] . '%';
+                $condiciones[] = "(nombre1 LIKE ? OR apellido1 LIKE ? OR correo LIKE ? OR telefono LIKE ?)";
+                $parametros[] = $buscar;
+                $parametros[] = $buscar;
+                $parametros[] = $buscar;
+                $parametros[] = $buscar;
+            }
+
+            $whereClause = implode(' AND ', $condiciones);
+            $orderBy = "ORDER BY fecha_creacion DESC";
+
+            // Construir consulta completa
+            $sql = "SELECT * FROM " . Usuarios::$tabla . " WHERE " . $whereClause . " " . $orderBy;
+            $usuarios = Usuarios::fetchArray($sql);
+
+            self::respuestaJSON(1, 'Usuarios filtrados obtenidos', $usuarios);
+        } catch (Exception $e) {
+            self::respuestaJSON(0, 'Error al filtrar usuarios: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public static function cambiarEstadoUsuario()
+    {
+        self::initSession();
+        if ((($_SESSION['user']['rol'] ?? null) !== 'administrador')) {
+            self::respuestaJSON(0, 'Acceso denegado - Solo administradores', null, 403);
+            return;
+        }
+
+        try {
+            if (empty($_POST['id_usuario']) || !isset($_POST['nuevo_estado'])) {
+                self::respuestaJSON(0, 'ID de usuario y estado requeridos', null, 400);
+                return;
+            }
+
+            $id = $_POST['id_usuario'];
+            $nuevoEstado = $_POST['nuevo_estado'];
+
+            // Validar que el estado sea válido
+            if (!in_array($nuevoEstado, ['0', '1'])) {
+                self::respuestaJSON(0, 'Estado inválido', null, 400);
+                return;
+            }
+
+            $usuario = Usuarios::find(['id_usuario' => $id]);
+            if (!$usuario) {
+                self::respuestaJSON(0, 'Usuario no encontrado', null, 404);
+                return;
+            }
+
+            $usuario->situacion = $nuevoEstado;
+
+            if ($usuario->guardar()) {
+                $estadoTexto = $nuevoEstado == 1 ? 'activado' : 'desactivado';
+                self::respuestaJSON(1, "Usuario {$estadoTexto} exitosamente", null);
+            } else {
+                self::respuestaJSON(0, 'Error al cambiar estado del usuario', null, 500);
+            }
+        } catch (Exception $e) {
+            self::respuestaJSON(0, 'Error al cambiar estado: ' . $e->getMessage(), null, 500);
         }
     }
 }

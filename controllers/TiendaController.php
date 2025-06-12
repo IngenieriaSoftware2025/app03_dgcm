@@ -8,13 +8,10 @@ class TiendaController
 {
     public static function index(Router $router)
     {
-        // PÁGINA PRINCIPAL DE LA TIENDA - ACCESO PÚBLICO
-        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
-
-        $router->render('tienda/index', [
+        $router->render('tienda/publico/index', [
             'titulo' => 'Tienda Online - Inicio',
             'usuario_logueado' => isset($_SESSION['user'])
-        ], 'tienda');
+        ], 'tienda_layout');
     }
 
     public static function categoria(Router $router)
@@ -24,27 +21,27 @@ class TiendaController
         $router->render('tienda/categoria', [
             'titulo' => 'Categoría: ' . ucfirst($categoria),
             'categoria' => $categoria
-        ], 'tienda');
+        ], 'tienda_layout');
     }
 
     public static function ofertas(Router $router)
     {
         $router->render('tienda/ofertas', [
             'titulo' => 'Ofertas Especiales'
-        ], 'tienda');
+        ], 'tienda_layout');
     }
 
     public static function carrito(Router $router)
     {
         $router->render('tienda/carrito', [
             'titulo' => 'Carrito de Compras'
-        ], 'tienda');
+        ], 'tienda_layout');
     }
 
     public static function contacto(Router $router)
     {
         $router->render('tienda/contacto', [
             'titulo' => 'Contáctanos'
-        ], 'tienda');
+        ], 'tienda_layout');
     }
 }

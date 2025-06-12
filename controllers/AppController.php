@@ -10,41 +10,28 @@ class AppController
     {
         if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
-        // Si no hay sesión, mostrar página de inicio o login
+        // Si no hay sesión, mostrar tienda pública
         if (!isset($_SESSION['user'])) {
             header('Location: /app03_dgcm/tienda');
             exit;
         }
 
-        // Si ya está logueado, mostrar dashboard según rol
+        // Si ya está logueado, dashboard según rol
         $rol = $_SESSION['user']['rol'] ?? '';
-        $usuario = $_SESSION['user'];
-
         switch ($rol) {
             case 'administrador':
-                $router->render('dashboard/admin', [
-                    'titulo' => 'Panel Administrativo',
-                    'usuario' => $usuario
-                ], 'layout');
+                header('Location: /app03_dgcm/admin');
                 break;
-
             case 'empleado':
-                $router->render('dashboard/empleado', [
-                    'titulo' => 'Panel Empleado',
-                    'usuario' => $usuario
-                ], 'empleado');
+                header('Location: /app03_dgcm/empleado');
                 break;
-
             case 'cliente':
-                $router->render('dashboard/cliente', [
-                    'titulo' => 'Panel Cliente',
-                    'usuario' => $usuario
-                ], 'cliente');
+                header('Location: /app03_dgcm/tienda');
                 break;
-
             default:
-                $router->render('inicio/index', [], 'layout');
+                header('Location: /app03_dgcm/tienda');
                 break;
         }
+        exit;
     }
 }

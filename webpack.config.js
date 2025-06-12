@@ -5,11 +5,17 @@ module.exports = {
   entry: {
     'js/app': './src/js/app.js',
     'js/inicio': './src/js/inicio.js',
-    'js/roles/roles': './src/js/roles/roles.js',
-    'js/login/index': './src/js/login/index.js',
-    'js/registro/index': './src/js/registro/index.js',
-    'js/permisos/permisos': './src/js/permisos/permisos.js',
-    'js/tienda/index': './src/js/tienda/index.js',
+
+    // tienda
+    'js/views/tienda/layout': './src/js/views/tienda/layout.js',
+    'js/views/tienda/index': './src/js/views/tienda/index.js',
+    'js/views/tienda/publico/index': './src/js/views/tienda/publico/index.js',
+
+    // admin
+    'js/views/admin/marca/index': './src/js/views/admin/marca/index.js',
+    'js/views/admin/celulares/index': './src/js/views/admin/celulares/index.js',
+    'js/views/admin/usuarios/index': './src/js/views/admin/usuarios/index.js',
+
   },
   output: {
     filename: '[name].js',
