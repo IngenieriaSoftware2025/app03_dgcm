@@ -190,16 +190,23 @@ class AsigPermisosController extends ActiveRecord
     public static function eliminarAsignacion()
     {
         try {
-            // validar que se envíe el ID de la asignación
             if (empty($_POST['id_asig_permiso'])) {
                 self::respuestaJSON(0, 'ID de asignación requerido', null, 400);
             }
 
-            // Usamos el helper lógico para eliminar la asignación
-            AsigPermisos::eliminarLogicoConRespuesta(
-                $_POST['id_asig_permiso'],
-                'id_asig_permiso'
-            );
+            $permisoAsig = AsigPermisos::find(['id_asig_permiso' => $_POST['id_asig_permiso']]);
+
+            if (!$permisoAsig) {
+                self::respuestaJSON(0, 'Asignación de permiso no encontrada', null, 404);
+            }
+
+            // Aquí está el cambio clave
+            $permisoAsig->sincronizar([
+                'situacion' => 0,
+                'fecha_expiro' => date('Y-m-d H:i:s')
+            ]);
+
+            $permisoAsig->guardarConRespuesta();
         } catch (Exception $e) {
             self::respuestaJSON(0, 'Error al eliminar asignación: ' . $e->getMessage(), null, 500);
         }

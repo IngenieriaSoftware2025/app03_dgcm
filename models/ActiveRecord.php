@@ -676,4 +676,30 @@ class ActiveRecord
             self::respuestaJSON(0, 'Error al buscar registros: ' . $e->getMessage(), null, 500);
         }
     }
+
+    public function guardarConRespuesta($validaciones = [])
+    {
+        try {
+            // Ejecutar validaciones personalizadas (si existen)
+            if (!empty($validaciones)) {
+                foreach ($validaciones as $validacion) {
+                    $resultado = $validacion($this);
+                    if ($resultado !== true) {
+                        self::respuestaJSON(0, $resultado, null, 400);
+                    }
+                }
+            }
+
+            // Guardar registro (insert o update automático)
+            $resultado = $this->guardar();
+
+            if ($resultado) {
+                self::respuestaJSON(1, 'Operación realizada exitosamente');
+            } else {
+                self::respuestaJSON(0, 'Error al guardar en base de datos');
+            }
+        } catch (\Exception $e) {
+            self::respuestaJSON(0, 'Error al guardar: ' . $e->getMessage());
+        }
+    }
 }

@@ -35,13 +35,6 @@
                         <textarea class="form-control" id="motivo" name="motivo" rows="3" placeholder="Ingrese el motivo..."></textarea>
                     </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="fecha_expiro" class="form-label">Fecha de Expiración</label>
-                            <input type="date" class="form-control" id="fecha_expiro" name="fecha_expiro">
-                        </div>
-                    </div>
-
                     <div class="d-flex justify-content-between">
                         <div>
                             <button type="submit" class="btn btn-success" id="BtnGuardar">

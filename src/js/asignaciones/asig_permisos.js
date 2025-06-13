@@ -14,7 +14,6 @@ const BtnLimpiar = document.getElementById('BtnLimpiar');
 const selectUsuario = document.getElementById('id_usuario');
 const selectPermiso = document.getElementById('id_permiso_app');
 const motivo = document.getElementById('motivo');
-const fecha_expiro = document.getElementById('fecha_expiro');
 
 // Botones de navegación
 const BtnVerAsignaciones = document.getElementById('BtnVerAsignaciones');
@@ -201,7 +200,6 @@ const llenarFormulario = async (e) => {
     selectUsuario.value = fila.id_usuario;
     selectPermiso.value = fila.id_permiso_app;
     motivo.value = fila.motivo;
-    fecha_expiro.value = fila.fecha_expiro ?? '';
 
     BtnGuardar.classList.add('d-none');
     BtnModificar.classList.remove('d-none');

@@ -1,4 +1,3 @@
-
 CREATE DATABASE app03_carbajal_clase;
 
 SELECT * FROM usuarios
@@ -33,7 +32,6 @@ CREATE TABLE aplicacion (
 select *from permisos
 CREATE TABLE permisos (
     id_permiso SERIAL PRIMARY KEY,
-    id_app INT,
     nombre_permiso VARCHAR(70) NOT NULL,
     clave_permiso VARCHAR(70),
     descripcion VARCHAR(255),
@@ -41,16 +39,25 @@ CREATE TABLE permisos (
     situacion SMALLINT  DEFAULT 1
 );
 
-ALTER TABLE permisos 
-    ADD CONSTRAINT FOREIGN KEY (id_app) 
-    REFERENCES aplicacion CONSTRAINT fk_perm_aplicacion;
+SELECT * FROM permiso_aplicacion
+CREATE TABLE permiso_aplicacion (
+    id_permiso_app SERIAL PRIMARY KEY,
+    id_permiso INT NOT NULL,
+    id_app INT NOT NULL,
+    fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1,
+  
+    FOREIGN KEY (id_permiso) REFERENCES permisos (id_permiso),
+    FOREIGN KEY (id_app) REFERENCES aplicacion (id_app)
+);
+
 ----------------------------------------------------------------------
 select *from asig_permisos
 DROP TABLE asig_permisos
 CREATE TABLE asig_permisos (
     id_asig_permiso SERIAL PRIMARY KEY,
     id_usuario INT,
-    id_permiso INT,
+    id_permiso_app INT,
     fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
     fecha_expiro DATETIME YEAR TO SECOND,
     usuario_asigno INT,
@@ -63,36 +70,5 @@ ALTER TABLE asig_permisos
     REFERENCES usuarios CONSTRAINT fk_permisos_usuarios;
     
 ALTER TABLE asig_permisos 
-    ADD CONSTRAINT FOREIGN KEY (id_permiso) 
-    REFERENCES permisos CONSTRAINT fk_permisos_asig;
---------------------------------------------------------
-DROP TABLE historial_act
-CREATE TABLE historial_act (
-    id_hist_act SERIAL PRIMARY KEY,
-    id_usuario INT,
-    id_ruta INT,
-    fecha_creacion DATETIME YEAR TO MINUTE,
-    ejecucion LVARCHAR(2056),
-    status SMALLINT,
-    situacion SMALLINT  DEFAULT 1
-);
-
-
-ALTER TABLE historial_act 
-    ADD CONSTRAINT FOREIGN KEY (id_usuario) 
-    REFERENCES usuarios CONSTRAINT fk_historial_usuarios;
-    
-ALTER TABLE historial_act 
-    ADD CONSTRAINT FOREIGN KEY (id_ruta) 
-    REFERENCES rutas CONSTRAINT fk_historial_rutas;
-----------------------------
-CREATE TABLE rutas (
-    id_ruta SERIAL PRIMARY KEY,
-    id_app INT,
-    descripcion LVARCHAR(2056),
-    situacion SMALLINT  DEFAULT 1
-);
-
-ALTER TABLE rutas 
-    ADD CONSTRAINT FOREIGN KEY (id_app) 
-    REFERENCES aplicacion CONSTRAINT fk_rutas_aplicacion;
+    ADD CONSTRAINT FOREIGN KEY (id_permiso_app) 
+    REFERENCES permiso_aplicacion CONSTRAINT fk_permisos_asig;

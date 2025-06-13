@@ -2,6 +2,8 @@
 
 namespace Controllers;
 
+use Exception;
+use Model\ActiveRecord;
 use MVC\Router;
 
 class AppController
