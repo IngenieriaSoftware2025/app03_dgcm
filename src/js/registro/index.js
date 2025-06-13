@@ -293,7 +293,7 @@ const guardaUsuario = async (e) => {
     //     console.log(`${key}: ${value}`);
     // }
 
-    const url = '/app03_dgcm/guarda_usuario';
+    const url = '/app03_carbajal_clase/guarda_usuario';
     const config = {
         method: 'POST',
         body
@@ -363,7 +363,7 @@ const guardaUsuario = async (e) => {
 
 // Buscar usuarios
 const buscaUsuario = async () => {
-    const url = '/app03_dgcm/busca_usuario';
+    const url = '/app03_carbajal_clase/busca_usuario';
     const config = {
         method: 'GET'
     }
@@ -501,7 +501,7 @@ const modificaUsuario = async (e) => {
     }
 
     const body = new FormData(FormRegistro);
-    const url = '/app03_dgcm/modifica_usuario';
+    const url = '/app03_carbajal_clase/modifica_usuario';
     const config = {
         method: 'POST',
         body
@@ -563,7 +563,7 @@ const eliminaUsuario = async (e) => {
     body.append('id_usuario', idUsuario);
 
     try {
-        const respuesta = await fetch('/app03_dgcm/elimina_usuario', {
+        const respuesta = await fetch('/app03_carbajal_clase/elimina_usuario', {
             method: 'POST',
             body
         });

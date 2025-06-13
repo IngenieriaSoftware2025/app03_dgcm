@@ -146,7 +146,7 @@ const guardaCliente = async (e) => {
     }
     // Crea una instancia de la clase FormData
     const body = new FormData(FormClientes);
-    const url = '/app03_dgcm/guarda_cliente';
+    const url = '/app03_carbajal_clase/guarda_cliente';
     const config = {
         method: 'POST',
         body
@@ -190,7 +190,7 @@ const guardaCliente = async (e) => {
 }
 
 const buscaCliente = async () => {
-    const url = '/app03_dgcm/busca_cliente';
+    const url = '/app03_carbajal_clase/busca_cliente';
     const config = {
         method: 'GET'
     }
@@ -271,7 +271,7 @@ const modificaCliente = async (e) => {
     }
 
     const body = new FormData(FormClientes);
-    const url = '/app03_dgcm/modifica_cliente';
+    const url = '/app03_carbajal_clase/modifica_cliente';
     const config = {
         method: 'POST',
         body
@@ -332,9 +332,9 @@ const eliminaCliente = async (e) => {
     body.append('id_cliente', idCliente);
 
     try {
-        const respuesta = await fetch('/app03_dgcm/elimina_cliente', {
+        const respuesta = await fetch('/app03_carbajal_clase/elimina_cliente', {
             method: 'POST',
-            body 
+            body
         });
 
         const datos = await respuesta.json();

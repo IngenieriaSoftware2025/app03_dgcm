@@ -13,7 +13,6 @@ const BtnModificar = document.getElementById('BtnModificar');
 const BtnLimpiar = document.getElementById('BtnLimpiar');
 
 // CAMPOS ESPECÍFICOS DE PERMISOS
-const selectAplicacion = document.getElementById('id_app');
 const nombrePermiso = document.getElementById('nombre_permiso');
 const clavePermiso = document.getElementById('clave_permiso');
 const descripcionPermiso = document.getElementById('descripcion');
@@ -169,37 +168,6 @@ const validacionDescripcion = () => {
     }
 }
 
-// CARGAR APLICACIONES EN EL SELECT (FK)
-const cargarAplicaciones = async () => {
-    try {
-        const respuesta = await fetch('/app03_dgcm/busca_aplicacion');
-        const datos = await respuesta.json();
-
-        if (datos.codigo === 1 && datos.data) {
-            // Limpiar opciones anteriores (excepto la primera)
-            selectAplicacion.innerHTML = '<option value="">-- Selecciona una aplicación --</option>';
-
-            // Agregar aplicaciones al select
-            datos.data.forEach(app => {
-                const option = document.createElement('option');
-                option.value = app.id_app;
-                option.textContent = `${app.nombre_app_ct} - ${app.nombre_app_md}`;
-                selectAplicacion.appendChild(option);
-            });
-        }
-    } catch (error) {
-        console.error('Error cargando aplicaciones:', error);
-        Swal.fire({
-            position: "center",
-            icon: "error",
-            title: "Error",
-            text: "No se pudieron cargar las aplicaciones",
-            showConfirmButton: false,
-            timer: 2000
-        });
-    }
-}
-
 // DATATABLE PARA PERMISOS
 const datosDeTabla = new DataTable('#TablePermisos', {
     dom: `
@@ -222,15 +190,6 @@ const datosDeTabla = new DataTable('#TablePermisos', {
             data: 'id_permiso',
             width: '5%',
             render: (data, type, row, meta) => meta.row + 1
-        },
-        {
-            title: 'Aplicación',
-            data: 'aplicacion_siglas',
-            width: '15%',
-            render: (data, type, row) => {
-                return `<span class="badge bg-primary fs-6">${data}</span><br>
-                        <small class="text-muted">${row.aplicacion_nombre}</small>`;
-            }
         },
         {
             title: 'Nombre del Permiso',
@@ -264,7 +223,6 @@ const datosDeTabla = new DataTable('#TablePermisos', {
                 <div class='d-flex justify-content-center'>
                     <button class='btn btn-warning btn-sm modificar mx-1' 
                         data-id="${data}" 
-                        data-id_app="${row.id_app}"
                         data-nombre_permiso="${row.nombre_permiso}"  
                         data-clave_permiso="${row.clave_permiso}"
                         data-descripcion="${row.descripcion}"
@@ -328,7 +286,7 @@ const guardaPermiso = async (e) => {
         console.log(`${key}: ${value}`);
     }
 
-    const url = '/app03_dgcm/guarda_permiso';
+    const url = '/app03_carbajal_clase/guarda_permiso';
     const config = {
         method: 'POST',
         body
@@ -397,7 +355,7 @@ const guardaPermiso = async (e) => {
 
 // BUSCAR PERMISOS
 const buscaPermiso = async () => {
-    const url = '/app03_dgcm/busca_permiso';
+    const url = '/app03_carbajal_clase/busca_permiso';
     const config = {
         method: 'GET'
     }
@@ -444,11 +402,8 @@ const buscaPermiso = async () => {
 const llenarFormulario = async (e) => {
     const datos = e.currentTarget.dataset;
 
-    // Cargar aplicaciones primero
-    await cargarAplicaciones();
 
     document.getElementById('id_permiso').value = datos.id;
-    document.getElementById('id_app').value = datos.id_app;
     document.getElementById('nombre_permiso').value = datos.nombre_permiso;
     document.getElementById('clave_permiso').value = datos.clave_permiso;
     document.getElementById('descripcion').value = datos.descripcion;
@@ -522,7 +477,7 @@ const modificaPermiso = async (e) => {
     }
 
     const body = new FormData(FormPermisos);
-    const url = '/app03_dgcm/modifica_permiso';
+    const url = '/app03_carbajal_clase/modifica_permiso';
     const config = {
         method: 'POST',
         body
@@ -594,7 +549,7 @@ const eliminaPermiso = async (e) => {
     body.append('id_permiso', idPermiso);
 
     try {
-        const respuesta = await fetch('/app03_dgcm/elimina_permiso', {
+        const respuesta = await fetch('/app03_carbajal_clase/elimina_permiso', {
             method: 'POST',
             body
         });
@@ -655,7 +610,6 @@ BtnVerPermisos.addEventListener('click', () => {
 });
 
 BtnCrearPermiso.addEventListener('click', async () => {
-    await cargarAplicaciones(); // Cargar aplicaciones al crear nuevo
     limpiarFormulario();
     mostrarFormulario('Registrar Permiso');
 });
@@ -677,6 +631,5 @@ datosDeTabla.on('click', '.eliminar', eliminaPermiso);
 
 // INICIALIZAR AL CARGAR LA PÁGINA
 document.addEventListener('DOMContentLoaded', async () => {
-    await cargarAplicaciones(); // Cargar aplicaciones al inicio
     mostrarFormulario('Registrar Permiso');
 });

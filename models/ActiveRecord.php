@@ -527,7 +527,7 @@ class ActiveRecord
             }
 
             // Crear carpetas si no existen
-            $carpetaDestino = $_SERVER['DOCUMENT_ROOT'] . "/app03_dgcm/storage/imgs/$carpeta/";
+            $carpetaDestino = $_SERVER['DOCUMENT_ROOT'] . "/app03_carbajal_clase/storage/imgs/$carpeta/";
             if (!file_exists($carpetaDestino)) {
                 mkdir($carpetaDestino, 0755, true);
             }
@@ -554,7 +554,7 @@ class ActiveRecord
 
             // Mover archivo
             if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
-                $rutaRelativa = "/app03_dgcm/storage/imgs/$carpeta/$nombreArchivo";
+                $rutaRelativa = "/app03_carbajal_clase/storage/imgs/$carpeta/$nombreArchivo";
                 return [
                     'success' => true,
                     'ruta' => $rutaRelativa,
@@ -614,6 +614,55 @@ class ActiveRecord
 
             if ($orden) {
                 $query .= " ORDER BY " . $orden;
+            }
+
+            $resultados = self::fetchArray($query);
+
+            if ($resultados && count($resultados) > 0) {
+                self::respuestaJSON(1, 'Registros obtenidos exitosamente', $resultados);
+            } else {
+                self::respuestaJSON(1, 'No hay registros', []);
+            }
+        } catch (Exception $e) {
+            self::respuestaJSON(0, 'Error al buscar registros: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public static function buscarConRelacionMultiplesRespuesta($relaciones = [], $condiciones = "1=1", $orden = null)
+    {
+        try {
+            $tablaPrincipal = static::$tabla;
+            $query = "SELECT {$tablaPrincipal}.*";
+
+            // Para manejar alias de tablas en los JOINs
+            $tablasAlias = [$tablaPrincipal => $tablaPrincipal];
+
+            // Agregar campos de todas las relaciones
+            foreach ($relaciones as $i => $rel) {
+                $aliasTabla = isset($rel['alias']) ? $rel['alias'] : $rel['tabla'];
+                $tablasAlias[$aliasTabla] = $rel['tabla'];
+                foreach ($rel['campos'] as $alias => $campo) {
+                    $query .= ", {$aliasTabla}.{$campo} AS {$alias}";
+                }
+            }
+
+            $query .= " FROM {$tablaPrincipal} ";
+
+            // JOINs encadenados
+            foreach ($relaciones as $i => $rel) {
+                $tipoJoin = isset($rel['tipo']) ? $rel['tipo'] : 'INNER';
+                $aliasTabla = isset($rel['alias']) ? $rel['alias'] : $rel['tabla'];
+                $fromTabla = isset($rel['from']) ? $rel['from'] : $tablaPrincipal; // de qué tabla parte el JOIN
+                $fromCampo = $rel['llave_local'];
+                $toCampo = $rel['llave_foranea'];
+
+                $query .= "{$tipoJoin} JOIN {$rel['tabla']} AS {$aliasTabla} ON {$fromTabla}.{$fromCampo} = {$aliasTabla}.{$toCampo} ";
+            }
+
+            $query .= "WHERE {$condiciones}";
+
+            if ($orden) {
+                $query .= " ORDER BY {$orden}";
             }
 
             $resultados = self::fetchArray($query);

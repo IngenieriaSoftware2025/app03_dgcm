@@ -18,17 +18,6 @@
                     <form id="FormPermisos">
                         <input type="hidden" id="id_permiso" name="id_permiso">
 
-                        <!-- Aplicación (SELECT con llave foránea) -->
-                        <div class="row mb-3 justify-content-center">
-                            <div class="col-lg-6">
-                                <label for="id_app" class="form-label">Aplicación</label>
-                                <select class="form-select" id="id_app" name="id_app" required>
-                                    <option value="">-- Selecciona una aplicación --</option>
-                                    <!-- Se carga dinámicamente -->
-                                </select>
-                            </div>
-                        </div>
-
                         <div class="row mb-3 justify-content-center">
                             <div class="col-lg-6">
                                 <label for="nombre_permiso" class="form-label">Nombre del Permiso</label>

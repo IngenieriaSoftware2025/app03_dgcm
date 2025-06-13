@@ -13,7 +13,6 @@ class Permisos extends ActiveRecord
     public static $tabla = 'permisos';
     public static $idTabla = ['id_permiso'];
     public static $columnasDB = [
-        'id_app',
         'nombre_permiso',
         'clave_permiso',
         'descripcion',
@@ -23,7 +22,6 @@ class Permisos extends ActiveRecord
 
     // Crea las variables para almacenar los datos
     public $id_permiso;
-    public $id_app;
     public $nombre_permiso;
     public $clave_permiso;
     public $descripcion;
@@ -33,7 +31,6 @@ class Permisos extends ActiveRecord
     public function __construct($permiso = [])
     {
         $this->id_permiso = $permiso['id_permiso'] ?? null;
-        $this->id_app = $permiso['id_app'] ?? '';
         $this->nombre_permiso = $permiso['nombre_permiso'] ?? '';
         $this->clave_permiso = $permiso['clave_permiso'] ?? '';
         $this->descripcion = $permiso['descripcion'] ?? '';

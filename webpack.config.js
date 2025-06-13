@@ -5,11 +5,14 @@ module.exports = {
   entry: {
     'js/app': './src/js/app.js',
     'js/inicio': './src/js/inicio.js',
+
     'js/clientes/clientes': './src/js/clientes/clientes.js',
     'js/login/index': './src/js/login/index.js',
     'js/registro/index': './src/js/registro/index.js',
     'js/aplicaciones/aplicacion': './src/js/aplicaciones/aplicacion.js',
     'js/permisos/permisos': './src/js/permisos/permisos.js',
+    'js/permisos/permiso_aplicacion': './src/js/permisos/permiso_aplicacion.js',
+    'js/asignaciones/asig_permisos': './src/js/asignaciones/asig_permisos.js',
   },
   output: {
     filename: '[name].js',

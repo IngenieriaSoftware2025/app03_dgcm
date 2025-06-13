@@ -26,7 +26,7 @@
 
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="margin: 0;">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/app03_dgcm"><i class="bi bi-house-fill me-2"></i>Inicio</a>
+                        <a class="nav-link" aria-current="page" href="/app03_carbajal_clase"><i class="bi bi-house-fill me-2"></i>Inicio</a>
                     </li>
 
                     <div class="nav-item dropdown ">
@@ -36,10 +36,16 @@
                         <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
                             <!-- <h6 class="dropdown-header">Información</h6> -->
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/app03_dgcm/aplicaciones"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a aplicaciones</a>
+                                <a class="dropdown-item nav-link text-white " href="/app03_carbajal_clase/aplicaciones"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a aplicaciones</a>
                             </li>
                             <li>
-                                <a class="dropdown-item nav-link text-white " href="/app03_dgcm/permisos"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a permisos</a>
+                                <a class="dropdown-item nav-link text-white " href="/app03_carbajal_clase/permisos"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a permisos</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link text-white " href="/app03_carbajal_clase/permiso_aplicacion"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Asignar permisos a aplicaciones</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link text-white " href="/app03_carbajal_clase/asignacion_permisos"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Asignar perimisos a usuarios</a>
                             </li>
 
                         </ul>
@@ -53,12 +59,12 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" id="dropdownUsuario">
                         <li>
-                            <a class="dropdown-item" href="/app03_dgcm/login">
+                            <a class="dropdown-item" href="/app03_carbajal_clase/login">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/app03_dgcm/registro">
+                            <a class="dropdown-item" href="/app03_carbajal_clase/registro">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>Registrar usuario
                             </a>
                         </li>

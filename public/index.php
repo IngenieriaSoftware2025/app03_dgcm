@@ -12,6 +12,8 @@ use Controllers\LoginController;
 use Controllers\RegistroController;
 use Controllers\AplicacionController;
 use Controllers\PermisoController;
+use Controllers\AsigPermisosController;
+use Controllers\PermisoAplicacionController;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
@@ -52,6 +54,18 @@ $router->post('/guarda_permiso', [PermisoController::class, 'guardarPermiso']);
 $router->post('/modifica_permiso', [PermisoController::class, 'modificaPermiso']);
 $router->post('/elimina_permiso', [PermisoController::class, 'eliminaPermiso']);
 
+// Rutas para los permisos de las aplicaciones
+$router->get('/permiso_aplicacion', [PermisoAplicacionController::class, 'mostrarVista']);
+$router->get('/busca_permiso_aplicacion', [PermisoAplicacionController::class, 'buscarRelaciones']);
+$router->post('/guarda_permiso_aplicacion', [PermisoAplicacionController::class, 'guardarRelacion']);
+$router->post('/elimina_permiso_aplicacion', [PermisoAplicacionController::class, 'eliminarRelacion']);
+
+// Rutas para Asignación de Permisos
+$router->get('/asignacion_permisos', [AsigPermisosController::class, 'mostrarAsignaciones']);
+$router->get('/busca_asig_permiso', [AsigPermisosController::class, 'buscarAsignaciones']);
+$router->post('/guarda_asig_permiso', [AsigPermisosController::class, 'guardarAsignacion']);
+$router->post('/modifica_asig_permiso', [AsigPermisosController::class, 'modificarAsignacion']);
+$router->post('/elimina_asig_permiso', [AsigPermisosController::class, 'eliminarAsignacion']);
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();

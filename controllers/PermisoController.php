@@ -19,7 +19,6 @@ class PermisoController extends ActiveRecord
         try {
             // Validar campos requeridos usando helper
             $validacion = self::validarRequeridos($_POST, [
-                'id_app',
                 'nombre_permiso',
                 'clave_permiso',
                 'descripcion'
@@ -34,7 +33,6 @@ class PermisoController extends ActiveRecord
 
             // Crear permiso con validaciones personalizadas
             $permiso = new Permisos([
-                'id_app' => filter_var($datos['id_app'], FILTER_SANITIZE_NUMBER_INT),
                 'nombre_permiso' => ucwords(strtolower($datos['nombre_permiso'])),
                 'clave_permiso' => strtoupper($datos['clave_permiso']), // Clave en mayúsculas
                 'descripcion' => ucfirst(strtolower($datos['descripcion'])),
@@ -98,17 +96,7 @@ class PermisoController extends ActiveRecord
 
     public static function buscaPermiso()
     {
-        Permisos::buscarConRelacionRespuesta(
-            'aplicacion',                    // Tabla relacionada
-            'id_app',                       // Llave local
-            'id_app',                       // Llave foránea
-            [                               // Campos a traer de la relación
-                'aplicacion_siglas' => 'nombre_app_ct',
-                'aplicacion_nombre' => 'nombre_app_md'
-            ],
-            "permisos.situacion = 1",       // Condiciones
-            "permisos.nombre_permiso"       // Orden
-        );
+        Permisos::buscarConRespuesta("situacion = 1", "nombre_permiso");
     }
 
     public static function modificaPermiso()
@@ -132,7 +120,6 @@ class PermisoController extends ActiveRecord
 
             // Preparar TODOS los datos para sincronizar
             $datosParaSincronizar = [
-                'id_app' => filter_var($datos['id_app'], FILTER_SANITIZE_NUMBER_INT),
                 'nombre_permiso' => ucwords(strtolower($datos['nombre_permiso'])),
                 'clave_permiso' => strtoupper($datos['clave_permiso']), // Clave en mayúsculas
                 'descripcion' => ucfirst(strtolower($datos['descripcion'])),

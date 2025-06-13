@@ -120,6 +120,7 @@ class RegistroController extends ActiveRecord
             $id = $_POST['id_usuario'];
 
             // Buscar usuario existente
+            /** @var \Model\Usuarios $usuario */
             $usuario = Usuarios::find(['id_usuario' => $id]);
             if (!$usuario) {
                 self::respuestaJSON(0, 'Usuario no encontrado', null, 404);
@@ -129,23 +130,23 @@ class RegistroController extends ActiveRecord
             $datos = self::sanitizarDatos($_POST);
 
             // PROCESAR NUEVA FOTOGRAFIA SI SE SUBIÓ
-           if (isset($_FILES['fotografia']) && !empty($_FILES['fotografia']['tmp_name'])) {
-            
-            // Eliminar imagen anterior si existe
-            if (!empty($usuario->fotografia)) {
-                self::eliminarImagen($usuario->fotografia);
+            if (isset($_FILES['fotografia']) && !empty($_FILES['fotografia']['tmp_name'])) {
+
+                // Eliminar imagen anterior si existe
+                if (!empty($usuario->fotografia)) {
+                    self::eliminarImagen($usuario->fotografia);
+                }
+
+                // Subir nueva imagen con DPI como nombre
+                $resultadoImagen = self::subirImagen($_FILES['fotografia'], 'usuarios', 2097152, $usuario->dpi);
+
+                if ($resultadoImagen['success']) {
+                    $usuario->fotografia = $resultadoImagen['ruta'];
+                } else {
+                    self::respuestaJSON(0, $resultadoImagen['mensaje'], null, 400);
+                    return;
+                }
             }
-            
-            // Subir nueva imagen con DPI como nombre
-            $resultadoImagen = self::subirImagen($_FILES['fotografia'], 'usuarios', 2097152, $usuario->dpi);
-            
-            if ($resultadoImagen['success']) {
-                $usuario->fotografia = $resultadoImagen['ruta'];
-            } else {
-                self::respuestaJSON(0, $resultadoImagen['mensaje'], null, 400);
-                return;
-            }
-        }
 
 
             // Actualizar propiedades

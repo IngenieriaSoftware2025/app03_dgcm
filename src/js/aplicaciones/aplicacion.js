@@ -297,7 +297,7 @@ const guardaAplicacion = async (e) => {
         console.log(`${key}: ${value}`);
     }
 
-    const url = '/app03_dgcm/guarda_aplicacion';
+    const url = '/app03_carbajal_clase/guarda_aplicacion';
     const config = {
         method: 'POST',
         body
@@ -367,7 +367,7 @@ const guardaAplicacion = async (e) => {
 
 // BUSCAR APLICACIONES
 const buscaAplicacion = async () => {
-    const url = '/app03_dgcm/busca_aplicacion';
+    const url = '/app03_carbajal_clase/busca_aplicacion';
     const config = {
         method: 'GET'
     }
@@ -488,7 +488,7 @@ const modificaAplicacion = async (e) => {
     }
 
     const body = new FormData(FormAplicacion);
-    const url = '/app03_dgcm/modifica_aplicacion';
+    const url = '/app03_carbajal_clase/modifica_aplicacion';
     const config = {
         method: 'POST',
         body
@@ -560,7 +560,7 @@ const eliminaAplicacion = async (e) => {
     body.append('id_app', idAplicacion);
 
     try {
-        const respuesta = await fetch('/app03_dgcm/elimina_aplicacion', {
+        const respuesta = await fetch('/app03_carbajal_clase/elimina_aplicacion', {
             method: 'POST',
             body
         });

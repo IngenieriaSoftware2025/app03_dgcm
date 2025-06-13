@@ -18,7 +18,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <a class="navbar-brand" href="/app03_dgcm/">
+            <a class="navbar-brand" href="/app03_carbajal_clase/">
                 <img src="<?= asset('./images/cit.png') ?>" width="35px" alt="cit">
                 Sistema de Celulares
             </a>
@@ -27,7 +27,7 @@
                 <!-- Menú izquierdo - Solo inicio -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="margin: 0;">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/app03_dgcm">
+                        <a class="nav-link" aria-current="page" href="/app03_carbajal_clase">
                             <i class="bi bi-house-fill me-2"></i>Inicio
                         </a>
                     </li>
