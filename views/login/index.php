@@ -14,16 +14,10 @@
                     <form id="FormLogin">
                         <div class="row mb-3">
                             <div class="col-12">
-                                <label for="correo" class="form-label">
+                                <label for="usuario_correo" class="form-label">
                                     <i class="bi bi-envelope me-1"></i>Correo Electrónico
                                 </label>
-                                <input
-                                    type="email"
-                                    class="form-control"
-                                    id="usuario_correo"
-                                    name="usuario_correo"
-                                    placeholder="ejemplo@empresa.com"
-                                    required>
+                                <input type="email" class="form-control" id="usuario_correo" name="usuario_correo" placeholder="ejemplo@empresa.com" required>
                             </div>
                         </div>
 
@@ -33,24 +27,14 @@
                                     <i class="bi bi-lock me-1"></i>Contraseña
                                 </label>
                                 <div class="input-group">
-                                    <input
-                                        type="password"
-                                        class="form-control"
-                                        id="usuario_clave"
-                                        name="usuario_clave"
-                                        placeholder="Ingrese su contraseña"
-                                        required>
-                                    <button
-                                        class="btn btn-outline-secondary"
-                                        type="button"
-                                        id="togglePassword">
+                                    <input type="password" class="form-control" id="usuario_clave" name="usuario_clave" placeholder="Ingrese su contraseña" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                         <i class="bi bi-eye" id="eyeIcon"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Contenedor para mostrar alertas -->
                         <div id="alertasLogin" class="mb-3"></div>
 
                         <div class="row justify-content-center mt-4">
@@ -71,6 +55,7 @@
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

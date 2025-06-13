@@ -10,7 +10,6 @@ class LoginController extends ActiveRecord
 {
     public static function index(Router $router)
     {
-        // $router->render('login/index', [], 'login');
         $router->render('login/index', [], 'login');
     }
 
@@ -19,7 +18,7 @@ class LoginController extends ActiveRecord
         getHeadersApi();
 
         try {
-            $correo = filter_var($_POST['correo'] ?? '', FILTER_SANITIZE_EMAIL);
+            $correo = filter_var($_POST['usuario_correo'] ?? '', FILTER_SANITIZE_EMAIL);
             $clave = $_POST['usuario_clave'] ?? '';
 
             $query = "SELECT id_usuario, usuario_clave FROM usuarios WHERE correo = '$correo' AND situacion = 1";
@@ -30,13 +29,12 @@ class LoginController extends ActiveRecord
                     session_start();
                     $_SESSION['login'] = true;
                     $_SESSION['id_usuario'] = $usuario['id_usuario'];
-
-                    Usuarios::respuestaJSON(1, 'usuario logueado existosamente');
+                    Usuarios::respuestaJSON(1, 'Usuario logueado exitosamente');
                 } else {
-                    Usuarios::respuestaJSON(0, 'La contraseña que ingresó es incorrecta');
+                    Usuarios::respuestaJSON(0, 'La contraseña es incorrecta');
                 }
             } else {
-                Usuarios::respuestaJSON(0, 'El usuario que intenta loguearse no existe');
+                Usuarios::respuestaJSON(0, 'El usuario no existe');
             }
         } catch (\Exception $e) {
             Usuarios::respuestaJSON(0, 'Error al intentar loguearse', null, 500);
@@ -48,23 +46,11 @@ class LoginController extends ActiveRecord
         session_start();
         $_SESSION = [];
         session_destroy();
-
         Usuarios::respuestaJSON(1, 'Sesión finalizada');
-    }
-
-    public static function verificarSesion()
-    {
-        session_start();
-        if (isset($_SESSION['login'])) {
-            Usuarios::respuestaJSON(1, 'Sesión activa');
-        } else {
-            Usuarios::respuestaJSON(0, 'Sin sesión');
-        }
     }
 
     public static function renderInicio(Router $router)
     {
-
         $router->render('pages/index', [], 'layout');
     }
 }
