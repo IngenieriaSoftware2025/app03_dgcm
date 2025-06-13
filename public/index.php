@@ -23,6 +23,8 @@ $router->get('/', [AppController::class, 'index']);
 $router->get('/login', [LoginController::class, 'index']);
 $router->post('/API/login', [LoginController::class, 'login']);
 $router->get('/inicio', [LoginController::class, 'renderInicio']);
+$router->get('/logout', [LoginController::class, 'logout']);
+
 
 // Get en nuestro idioma significa obtener, osea obtiene la vista de la pagina y la muestra al cliente
 $router->get('/clientes', [ClienteController::class, 'mostrarPagina']);

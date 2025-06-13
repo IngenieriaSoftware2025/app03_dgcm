@@ -14,7 +14,7 @@
                     <form id="FormLogin">
                         <div class="row mb-3">
                             <div class="col-12">
-                                <label for="usuario_correo" class="form-label">
+                                <label for="correo" class="form-label">
                                     <i class="bi bi-envelope me-1"></i>Correo Electrónico
                                 </label>
                                 <input
