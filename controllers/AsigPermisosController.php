@@ -88,6 +88,18 @@ class AsigPermisosController extends ActiveRecord
         AsigPermisos::buscarConRelacionMultiplesRespuesta(
             [
                 [
+                    'tabla' => 'usuarios',
+                    'alias' => 'u',
+                    'llave_local' => 'id_usuario',
+                    'llave_foranea' => 'id_usuario',
+                    'campos' => [
+                        'nombre_usuario' => 'nombre1',
+                        'apellido_usuario' => 'apellido1',
+                        'dpi_usuario' => 'dpi'
+                    ],
+                    'tipo' => 'INNER'
+                ],
+                [
                     'tabla' => 'permiso_aplicacion',
                     'alias' => 'pa',
                     'llave_local' => 'id_permiso_app',

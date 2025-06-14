@@ -55,7 +55,14 @@ const cargarUsuarios = async () => {
         }
     } catch (e) {
         console.error('Error al cargar usuarios:', e);
-        Swal.fire("Error", "No se pudieron cargar los usuarios", "error");
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error",
+            text: "No se pudieron cargar los usuarios",
+            showConfirmButton: false,
+            timer: 2000
+        });
     }
 };
 
@@ -91,7 +98,7 @@ const tablaAsignaciones = new DataTable('#TableAsignaciones', {
         { title: 'Permiso', data: 'permiso' },
         { title: 'Aplicación', data: 'nombre_aplicacion' },
         { title: 'Motivo', data: 'motivo' },
-        { title: 'Expiración', data: 'fecha_expiro' },
+        { title: 'Creación', data: 'fecha_creacion' },
         {
             title: 'Acciones', data: 'id_asig_permiso', render: (data, type, row) => `
                 <button class="btn btn-warning btn-sm modificar mx-1" data-id="${data}" data-json='${JSON.stringify(row)}'>
@@ -120,7 +127,14 @@ const guardaAsignacion = async (e) => {
     BtnGuardar.disabled = true;
 
     if (!validarFormulario(FormAsigPermisos, ['id_asig_permiso'])) {
-        Swal.fire("Error", "Complete todos los campos", "warning");
+        Swal.fire({
+            position: "center",
+            icon: "warning",
+            title: "Formulario incompleto",
+            text: "Complete todos los campos",
+            showConfirmButton: false,
+            timer: 1000
+        });
         BtnGuardar.disabled = false;
         return;
     }
@@ -130,11 +144,39 @@ const guardaAsignacion = async (e) => {
     const datos = await resp.json();
 
     if (datos.codigo === 1) {
-        Swal.fire("Guardado", datos.mensaje, "success");
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "¡Éxito!",
+            text: datos.mensaje,
+            showConfirmButton: false,
+            timer: 1000
+        });
         limpiarFormulario();
-        mostrarTabla();
+
+        setTimeout(async () => {
+            const resultado = await Swal.fire({
+                title: '¿Desea ver las asignaciones registradas?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, ver asignaciones',
+                cancelButtonText: 'Seguir asignando'
+            });
+
+            if (resultado.isConfirmed) {
+                mostrarTabla();
+            }
+        }, 1000);
+
     } else {
-        Swal.fire("Error", datos.mensaje, "error");
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error",
+            text: datos.mensaje,
+            showConfirmButton: false,
+            timer: 2000
+        });
     }
     BtnGuardar.disabled = false;
 };
@@ -155,11 +197,25 @@ const modificaAsignacion = async (e) => {
     const datos = await resp.json();
 
     if (datos.codigo === 1) {
-        Swal.fire("Modificado", datos.mensaje, "success");
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "¡Éxito!",
+            text: datos.mensaje,
+            showConfirmButton: false,
+            timer: 1000
+        });
         limpiarFormulario();
         mostrarTabla();
     } else {
-        Swal.fire("Error", datos.mensaje, "error");
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error",
+            text: datos.mensaje,
+            showConfirmButton: false,
+            timer: 2000
+        });
     }
     BtnModificar.disabled = false;
 };
@@ -183,10 +239,24 @@ const eliminaAsignacion = async (e) => {
     const datos = await resp.json();
 
     if (datos.codigo === 1) {
-        Swal.fire("Eliminado", datos.mensaje, "success");
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "¡Éxito!",
+            text: datos.mensaje,
+            showConfirmButton: false,
+            timer: 1000
+        });
         buscaAsignaciones();
     } else {
-        Swal.fire("Error", datos.mensaje, "error");
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error",
+            text: datos.mensaje,
+            showConfirmButton: false,
+            timer: 2000
+        });
     }
 };
 
