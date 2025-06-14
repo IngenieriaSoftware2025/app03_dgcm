@@ -4,6 +4,31 @@ import { validarFormulario } from '../funciones';
 
 const FormLogin = document.getElementById('FormLogin');
 const BtnLogin = document.getElementById('BtnLogin');
+const mostrarAyudaBtn = document.getElementById('mostrarAyuda');
+
+
+const mostrarAyuda = () => {
+    Swal.fire({
+        title: '📞 Ayuda y Soporte',
+        html: `
+            <div style="text-align: left;">
+                <p><strong>Para obtener acceso al sistema, contacte al administrador:</strong></p>
+                <hr>
+                <p><i class="bi bi-telephone-fill"></i> <strong>Teléfono:</strong> 2345-6789</p>
+                <p><i class="bi bi-envelope-fill"></i> <strong>Email:</strong> admin@sistema.com</p>
+                <p><i class="bi bi-clock-fill"></i> <strong>Horario:</strong> Lunes a Viernes 8:00 AM - 5:00 PM</p>
+            </div>
+        `,
+        icon: 'info',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#007bff',
+        background: '#f8f9fa',
+        customClass: {
+            title: 'custom-title-class',
+            htmlContainer: 'custom-text-class'
+        }
+    });
+};
 
 const login = async (e) => {
     e.preventDefault();
@@ -22,7 +47,7 @@ const login = async (e) => {
 
     try {
         const body = new FormData(FormLogin);
-        const url = '/app03_carbajal_clase/API/login';
+        const url = '/API/login';
 
         const config = {
             method: 'POST',
@@ -50,7 +75,7 @@ const login = async (e) => {
             });
 
             FormLogin.reset();
-            location.href = '/app03_carbajal_clase/';
+            location.href = '/';
         } else {
             Swal.fire({
                 title: '¡Error!',
@@ -76,3 +101,7 @@ const login = async (e) => {
 };
 
 FormLogin.addEventListener('submit', login);
+
+if (mostrarAyudaBtn) {
+    mostrarAyudaBtn.addEventListener('click', mostrarAyuda);
+}

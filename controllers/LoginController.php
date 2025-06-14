@@ -46,7 +46,9 @@ class LoginController extends ActiveRecord
         session_start();
         $_SESSION = [];
         session_destroy();
-        Usuarios::respuestaJSON(1, 'Sesión finalizada');
+        // Usuarios::respuestaJSON(1, 'Sesión finalizada');
+        header('Location: /login');
+        exit;
     }
 
     public static function renderInicio(Router $router)

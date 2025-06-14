@@ -24,24 +24,16 @@
             </a>
 
             <div class="collapse navbar-collapse" id="navbarToggler">
-                <!-- Menú izquierdo - Solo inicio -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="margin: 0;">
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/app03_carbajal_clase">
-                            <i class="bi bi-house-fill me-2"></i>Inicio
-                        </a>
-                    </li>
-                </ul>
 
                 <!-- Menú derecho - Solo información de acceso -->
                 <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle text-white " href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-info-circle me-1"></i>Información
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                         <li>
-                            <span class="dropdown-item-text">
-                                <small class="text-muted">¿Necesita acceso?</small><br>
+                            <span class="dropdown-item-text text-white">
+                                <small class="ext-white">¿Necesita acceso?</small><br>
                                 <strong>Contacte al administrador</strong>
                             </span>
                         </li>
@@ -49,9 +41,9 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#" onclick="mostrarAyuda()">
-                                <i class="bi bi-question-circle me-2"></i>Ayuda
-                            </a>
+                            <button type="button" id="mostrarAyuda" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-question-circle"></i> Ayuda
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -78,11 +70,7 @@
         </div>
     </div>
 
-    <script>
-        function mostrarAyuda() {
-            alert('Para obtener acceso al sistema, contacte al administrador del sistema.\n\nTeléfono: [Número de soporte]\nEmail: admin@empresa.com');
-        }
-    </script>
+    <script src="<?= asset('build/js/login/index.js') ?>"></script>
 </body>
 
 </html>
