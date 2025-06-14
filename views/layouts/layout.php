@@ -53,23 +53,34 @@
 
                 </ul>
 
+                <?php session_start(); ?>
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle me-1 text-white"></i>Usuario
+                        <i class="bi bi-person-circle me-1 text-white"></i>
+                        <?= isset($_SESSION['user']) ? $_SESSION['user'] : 'Iniciar Sesión' ?>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" id="dropdownUsuario">
-                        <li>
-                            <a class="dropdown-item" href="/app03_carbajal_clase/login">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/app03_carbajal_clase/registro">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>Registrar usuario
-                            </a>
-                        </li>
+                        <?php if (isset($_SESSION['user'])): ?>
+                            <li>
+                                <a class="dropdown-item" href="/app03_carbajal_clase/logout">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                                </a>
+                            </li>
+                        <?php else: ?>
+                            <li>
+                                <a class="dropdown-item" href="/app03_carbajal_clase/login">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/app03_carbajal_clase/registro">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Registrar usuario
+                                </a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
+
 
             </div>
         </div>
