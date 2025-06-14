@@ -18,26 +18,57 @@ class LoginController extends ActiveRecord
         getHeadersApi();
 
         try {
-            $correo = filter_var($_POST['usuario_correo'] ?? '', FILTER_SANITIZE_EMAIL);
-            $clave = $_POST['usuario_clave'] ?? '';
+            $correo = filter_var($_POST['correo'], FILTER_SANITIZE_EMAIL);
+            $clave = htmlspecialchars($_POST['usuario_clave']);
 
-            $query = "SELECT id_usuario, usuario_clave FROM usuarios WHERE correo = '$correo' AND situacion = 1";
-            $usuario = Usuarios::fetchFirst($query);
+            $queryUsuario = "SELECT id_usuario, nombre1, apellido1, usuario_clave FROM usuarios WHERE correo = '$correo' AND situacion = 1";
+
+            $usuario = ActiveRecord::fetchArray($queryUsuario)[0];
 
             if ($usuario) {
-                if (password_verify($clave, $usuario['usuario_clave'])) {
+                $passDB = $usuario['usuario_clave'];
+
+                if (password_verify($clave, $passDB)) {
                     session_start();
-                    $_SESSION['login'] = true;
+
+                    $nombreUsuario = $usuario['nombre1'] . ' ' . $usuario['apellido1'];
+                    $_SESSION['user'] = $nombreUsuario;
                     $_SESSION['id_usuario'] = $usuario['id_usuario'];
-                    Usuarios::respuestaJSON(1, 'Usuario logueado exitosamente');
+                    $_SESSION['login'] = true;
+
+                    // Obtener permisos corregido según tu esquema
+                    $sqlPermisos = "SELECT p.clave_permiso, p.nombre_permiso, a.nombre_app_ct 
+                                FROM asig_permisos ap
+                                INNER JOIN permiso_aplicacion pa ON ap.id_permiso_app = pa.id_permiso_app
+                                INNER JOIN permisos p ON pa.id_permiso = p.id_permiso
+                                INNER JOIN aplicacion a ON pa.id_app = a.id_app
+                                WHERE ap.id_usuario = {$usuario['id_usuario']} AND ap.situacion = 1";
+
+                    $permisos = ActiveRecord::fetchArray($sqlPermisos);
+                    $_SESSION['permisos'] = $permisos;
+
+                    echo json_encode([
+                        'codigo' => 1,
+                        'mensaje' => 'Usuario logueado exitosamente'
+                    ]);
                 } else {
-                    Usuarios::respuestaJSON(0, 'La contraseña es incorrecta');
+                    echo json_encode([
+                        'codigo' => 0,
+                        'mensaje' => 'La contraseña es incorrecta'
+                    ]);
                 }
             } else {
-                Usuarios::respuestaJSON(0, 'El usuario no existe');
+                echo json_encode([
+                    'codigo' => 0,
+                    'mensaje' => 'El usuario no existe'
+                ]);
             }
-        } catch (\Exception $e) {
-            Usuarios::respuestaJSON(0, 'Error al intentar loguearse', null, 500);
+        } catch (Exception $e) {
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al intentar loguearse',
+                'detalle' => $e->getMessage()
+            ]);
         }
     }
 
@@ -46,13 +77,34 @@ class LoginController extends ActiveRecord
         session_start();
         $_SESSION = [];
         session_destroy();
-        // Usuarios::respuestaJSON(1, 'Sesión finalizada');
-        header('Location: /login');
+        header('Location: /app03_carbajal_clase/login');
         exit;
     }
 
     public static function renderInicio(Router $router)
     {
-        $router->render('pages/index', [], 'layout');
+        session_start();
+        if (!isset($_SESSION['login']) || !$_SESSION['login']) {
+            header('Location: /app03_carbajal_clase/login');
+            exit;
+        }
+
+        $router->render('pages/index', [
+            'usuario' => $_SESSION['user'] ?? '',
+            'permisos' => $_SESSION['permisos'] ?? []
+        ], 'layout');
+    }
+
+    public static function tienePermiso($clavePermiso)
+    {
+        session_start();
+        if (!isset($_SESSION['permisos'])) return false;
+
+        foreach ($_SESSION['permisos'] as $permiso) {
+            if ($permiso['clave_permiso'] === $clavePermiso) {
+                return true;
+            }
+        }
+        return false;
     }
 }

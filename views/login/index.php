@@ -14,10 +14,10 @@
                     <form id="FormLogin">
                         <div class="row mb-3">
                             <div class="col-12">
-                                <label for="usuario_correo" class="form-label">
+                                <label for="correo" class="form-label">
                                     <i class="bi bi-envelope me-1"></i>Correo Electrónico
                                 </label>
-                                <input type="email" class="form-control" id="usuario_correo" name="usuario_correo" placeholder="ejemplo@empresa.com" required>
+                                <input type="email" class="form-control" id="correo" name="correo" placeholder="ejemplo@empresa.com" required>
                             </div>
                         </div>
 
@@ -60,5 +60,3 @@
         </div>
     </div>
 </div>
-
-<script src="<?= asset('build/js/login/index.js') ?>"></script>

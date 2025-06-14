@@ -6,16 +6,32 @@ const FormLogin = document.getElementById('FormLogin');
 const BtnLogin = document.getElementById('BtnLogin');
 const mostrarAyudaBtn = document.getElementById('mostrarAyuda');
 
+const togglePassword = () => {
+    const passwordField = document.getElementById('usuario_clave');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    if (passwordField.type === 'password') {
+        // Mostrar contraseña
+        passwordField.type = 'text';
+        eyeIcon.classList.remove('bi-eye');
+        eyeIcon.classList.add('bi-eye-slash');
+    } else {
+        // Ocultar contraseña
+        passwordField.type = 'password';
+        eyeIcon.classList.remove('bi-eye-slash');
+        eyeIcon.classList.add('bi-eye');
+    }
+};
 
 const mostrarAyuda = () => {
     Swal.fire({
-        title: '📞 Ayuda y Soporte',
+        title: 'Ayuda y Soporte',
         html: `
             <div style="text-align: left;">
                 <p><strong>Para obtener acceso al sistema, contacte al administrador:</strong></p>
                 <hr>
-                <p><i class="bi bi-telephone-fill"></i> <strong>Teléfono:</strong> 2345-6789</p>
-                <p><i class="bi bi-envelope-fill"></i> <strong>Email:</strong> admin@sistema.com</p>
+                <p><i class="bi bi-telephone-fill"></i> <strong>Teléfono:</strong> 9773-4613</p>
+                <p><i class="bi bi-envelope-fill"></i> <strong>Email:</strong> admin@ventas.com</p>
                 <p><i class="bi bi-clock-fill"></i> <strong>Horario:</strong> Lunes a Viernes 8:00 AM - 5:00 PM</p>
             </div>
         `,
@@ -47,7 +63,7 @@ const login = async (e) => {
 
     try {
         const body = new FormData(FormLogin);
-        const url = '/API/login';
+        const url = '/app03_carbajal_clase/login';
 
         const config = {
             method: 'POST',
@@ -75,7 +91,9 @@ const login = async (e) => {
             });
 
             FormLogin.reset();
-            location.href = '/';
+            setTimeout(() => {
+                location.href = '/app03_carbajal_clase/';
+            }, 100);
         } else {
             Swal.fire({
                 title: '¡Error!',
@@ -100,8 +118,35 @@ const login = async (e) => {
     BtnLogin.disabled = false;
 };
 
-FormLogin.addEventListener('submit', login);
+document.addEventListener('DOMContentLoaded', function () {
+    const FormLogin = document.getElementById('FormLogin');
+    const BtnLogin = document.getElementById('BtnLogin');
+    const mostrarAyudaBtn = document.getElementById('mostrarAyuda');
+    const togglePasswordBtn = document.getElementById('togglePassword');
 
-if (mostrarAyudaBtn) {
-    mostrarAyudaBtn.addEventListener('click', mostrarAyuda);
-}
+    console.log('DOM cargado');
+
+    // Event listener para el formulario de login
+    if (FormLogin && BtnLogin) {
+        FormLogin.addEventListener('submit', login);
+        console.log('Event listener del form agregado');
+    }
+
+    // Event listener para el botón de ayuda
+    if (mostrarAyudaBtn) {
+        mostrarAyudaBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            mostrarAyuda();
+        });
+        console.log('Event listener del botón ayuda agregado');
+    }
+
+    // ✅ Event listener para mostrar/ocultar contraseña
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            togglePassword();
+        });
+        console.log('Event listener del toggle password agregado');
+    }
+});

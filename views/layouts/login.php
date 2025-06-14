@@ -24,30 +24,17 @@
             </a>
 
             <div class="collapse navbar-collapse" id="navbarToggler">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Botón de ayuda -->
+                    <li class="nav-item">
+                        <button type="button" id="mostrarAyuda" class="btn btn-outline-light btn-sm me-2">
+                            <i class="bi bi-question-circle"></i> Ayuda
+                        </button>
+                    </li>
 
-                <!-- Menú derecho - Solo información de acceso -->
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white " href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-info-circle me-1"></i>Información
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                        <li>
-                            <span class="dropdown-item-text text-white">
-                                <small class="ext-white">¿Necesita acceso?</small><br>
-                                <strong>Contacte al administrador</strong>
-                            </span>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li>
-                            <button type="button" id="mostrarAyuda" class="btn btn-outline-info btn-sm">
-                                <i class="bi bi-question-circle"></i> Ayuda
-                            </button>
-                        </li>
-                    </ul>
-                </div>
+                </ul>
             </div>
+
         </div>
     </nav>
 
