@@ -8,6 +8,8 @@ use Model\ActiveRecord;
 use Model\AsigPermisos;
 use Model\Permisos;
 use Model\Aplicacion;
+use Model\Usuarios;
+use Model\PermisoAplicacion;
 
 class AsigPermisosController extends ActiveRecord
 {
@@ -23,7 +25,6 @@ class AsigPermisosController extends ActiveRecord
             $validacion = self::validarRequeridos($_POST, [
                 'id_usuario',
                 'id_permiso_app',
-                'usuario_asigno',
                 'motivo'
             ]);
 
@@ -40,7 +41,7 @@ class AsigPermisosController extends ActiveRecord
                 'id_permiso_app' => filter_var($datos['id_permiso_app'], FILTER_SANITIZE_NUMBER_INT),
                 'fecha_creacion' => date('Y-m-d H:i:s'),
                 'fecha_expiro' => null,
-                'usuario_asigno' => $_SESSION['usuario'] ?? '',
+                'usuario_asigno' => $_SESSION['id_usuario'] ?? 0,
                 'motivo' => ucfirst(strtolower($datos['motivo'])),
                 'situacion' => 1
             ]);
@@ -50,7 +51,7 @@ class AsigPermisosController extends ActiveRecord
 
                 // Funcion para validar que el usuario exista
                 function ($asignacion) {
-                    if (!AsigPermisos::valorExiste('id_usuario', $asignacion->id_usuario)) {
+                    if (!Usuarios::valorExiste('id_usuario', $asignacion->id_usuario)) {
                         return 'El usuario no existe';
                     }
                     return true;
@@ -149,7 +150,7 @@ class AsigPermisosController extends ActiveRecord
             $datosParaSincronizar = [
                 'id_usuario' => isset($datos['id_usuario']) ? filter_var($datos['id_usuario'], FILTER_SANITIZE_NUMBER_INT) : $permisosAsig->id_usuario,
                 'id_permiso_app' => isset($datos['id_permiso_app']) ? filter_var($datos['id_permiso_app'], FILTER_SANITIZE_NUMBER_INT) : $permisosAsig->id_permiso_app,
-                'usuario_asigno' => $_SESSION['usuario'] ?? $permisosAsig->usuario_asigno,
+                'usuario_asigno' => $_SESSION['id_usuario'] ?? $permisosAsig->usuario_asigno,
                 'motivo' => isset($datos['motivo']) ? ucfirst(strtolower($datos['motivo'])) : $permisosAsig->motivo,
                 'situacion' => isset($datos['situacion']) ? $datos['situacion'] : $permisosAsig->situacion
             ];
