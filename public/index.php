@@ -111,8 +111,8 @@ $router->post('/elimina_tipo_servicio', [TiposServiciosController::class, 'elimi
 
 // Rutas para Reparaciones
 $router->get('/reparaciones', [ReparacionesController::class, 'mostrarReparaciones']);
-$router->post('/guarda_reparacion', [ReparacionesController::class, 'guardarReparacion']);
 $router->get('/busca_reparacion', [ReparacionesController::class, 'buscarReparaciones']);
+$router->post('/guarda_reparacion', [ReparacionesController::class, 'guardarReparacion']);
 $router->post('/modifica_reparacion', [ReparacionesController::class, 'modificarReparacion']);
 $router->post('/elimina_reparacion', [ReparacionesController::class, 'eliminarReparacion']);
 

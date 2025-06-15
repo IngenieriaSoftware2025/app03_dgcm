@@ -56,7 +56,7 @@ const guardaMarca = async (e) => {
     BtnGuardar.disabled = true;
 
     // Validar formulario
-    if (!validarFormulario(FormMarca, ['nombre_marca'])) {
+    if (!validarFormulario(FormMarca, ['id_marca'])) {
         Swal.fire({
             position: "center",
             icon: "warning",
@@ -132,35 +132,143 @@ const guardaMarca = async (e) => {
 };
 
 
-const modificaMarca = async () => {
-    const body = new FormData(FormMarca);
-    const res = await fetch("/app03_carbajal_clase/modifica_marca", { method: 'POST', body });
-    const data = await res.json();
+const modificaMarca = async (e) => {
+    e.preventDefault();
+    BtnModificar.disabled = true;
 
-    if (data.codigo === 1) {
-        Swal.fire("Modificado", data.mensaje, "success");
-        limpiarFormulario();
-    } else {
-        Swal.fire("Error", data.mensaje, "error");
+    // Validar formulario
+    if (!validarFormulario(FormMarca)) {
+        Swal.fire({
+            position: "center",
+            icon: "warning",
+            title: "Formulario incompleto",
+            text: "Complete los campos obligatorios",
+            showConfirmButton: false,
+            timer: 1000
+        });
+        BtnModificar.disabled = false;
+        return;
     }
-}
 
-const eliminarMarca = async id => {
-    const conf = await Swal.fire({ title: "¿Eliminar?", showCancelButton: true });
-    if (!conf.isConfirmed) return;
+    const body = new FormData(FormMarca);
+    const url = '/app03_carbajal_clase/modifica_marca';
+    const config = {
+        method: 'POST',
+        body
+    };
+
+    try {
+        const respuesta = await fetch(url, config);
+        const data = await respuesta.json();
+
+        if (data.codigo === 1) {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "¡Marca modificada!",
+                text: data.mensaje,
+                showConfirmButton: false,
+                timer: 1000
+            });
+
+            limpiarFormulario();
+
+            setTimeout(() => {
+                mostrarTabla();
+            }, 1000);
+
+        } else {
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error",
+                text: data.mensaje,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
+    } catch (error) {
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error de conexión",
+            text: "No se pudo conectar con el servidor",
+            showConfirmButton: false,
+            timer: 1000
+        });
+    }
+
+    BtnModificar.disabled = false;
+};
+
+
+const eliminarMarca = async (e) => {
+    const id = e.currentTarget.dataset.id;
+
+    // Confirmación
+    const confirmacion = await Swal.fire({
+        title: "¿Eliminar marca?",
+        text: "Esta acción no se puede deshacer",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6"
+    });
+
+    if (!confirmacion.isConfirmed) return;
 
     const body = new FormData();
     body.append("id_marca", id);
-    const res = await fetch("/app03_carbajal_clase/elimina_marca", { method: 'POST', body });
-    const data = await res.json();
+    const url = '/app03_carbajal_clase/elimina_marca';
+    const config = {
+        method: 'POST',
+        body
+    };
 
-    if (data.codigo === 1) {
-        Swal.fire("Eliminado", data.mensaje, "success");
-        buscaMarcas();
-    } else {
-        Swal.fire("Error", data.mensaje, "error");
+    try {
+        const respuesta = await fetch(url, config);
+        const data = await respuesta.json();
+
+        if (data.codigo === 1) {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "¡Marca eliminada!",
+                text: data.mensaje,
+                showConfirmButton: false,
+                timer: 1000
+            });
+
+            // ir directo a la tabla
+            setTimeout(() => {
+                buscaMarcas();
+            }, 1000);
+
+        } else {
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error",
+                text: data.mensaje,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
+    } catch (error) {
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error de conexión",
+            text: "No se pudo conectar con el servidor",
+            showConfirmButton: false,
+            timer: 1000
+        });
     }
-}
+};
 
 const llenarFormulario = e => {
     const dataset = e.currentTarget.dataset;
@@ -183,7 +291,10 @@ FormMarca.addEventListener("submit", guardaMarca);
 BtnModificar.addEventListener("click", modificaMarca);
 BtnLimpiar.addEventListener("click", limpiarFormulario);
 BtnVerMarcas.addEventListener("click", mostrarTabla);
-BtnCrearMarca.addEventListener("click", () => { limpiarFormulario(); mostrarFormulario(); });
+BtnCrearMarca.addEventListener("click", () => {
+    limpiarFormulario();
+    mostrarFormulario();
+});
 BtnActualizarTabla.addEventListener("click", buscaMarcas);
 datosDeTabla.on("click", ".modificar", llenarFormulario);
-datosDeTabla.on("click", ".eliminar", e => eliminarMarca(e.currentTarget.dataset.id));
+datosDeTabla.on("click", ".eliminar", eliminarMarca);

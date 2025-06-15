@@ -1,3 +1,4 @@
+
 CREATE DATABASE app03_carbajal_clase;
 
 SELECT * FROM usuarios
@@ -72,21 +73,10 @@ ALTER TABLE asig_permisos
 ALTER TABLE asig_permisos 
     ADD CONSTRAINT FOREIGN KEY (id_permiso_app) 
     REFERENCES permiso_aplicacion CONSTRAINT fk_permisos_asig;
-
-
-CREATE TABLE rutas (
-    id_ruta SERIAL PRIMARY KEY,
-    id_app INT,
-    descripcion LVARCHAR(2056),
-    situacion SMALLINT  DEFAULT 1
-);
-
-ALTER TABLE rutas 
-    ADD CONSTRAINT FOREIGN KEY (id_app) 
-    REFERENCES aplicacion CONSTRAINT fk_rutas_aplicacion;
-
-
-
+    
+--------------------------------------------------------
+SELECT * FROM historial_act
+DROP TABLE historial_act
 CREATE TABLE historial_act (
     id_hist_act SERIAL PRIMARY KEY,
     id_usuario INT,
@@ -97,7 +87,6 @@ CREATE TABLE historial_act (
     situacion SMALLINT  DEFAULT 1
 );
 
-
 ALTER TABLE historial_act 
     ADD CONSTRAINT FOREIGN KEY (id_usuario) 
     REFERENCES usuarios CONSTRAINT fk_historial_usuarios;
@@ -105,7 +94,25 @@ ALTER TABLE historial_act
 ALTER TABLE historial_act 
     ADD CONSTRAINT FOREIGN KEY (id_ruta) 
     REFERENCES rutas CONSTRAINT fk_historial_rutas;
+---------------
+CREATE TABLE rutas (
+    id_ruta SERIAL PRIMARY KEY,
+    id_app INT,
+    descripcion LVARCHAR(2056),
+    situacion SMALLINT  DEFAULT 1
+);
 
+ALTER TABLE rutas 
+    ADD CONSTRAINT FOREIGN KEY (id_app) 
+    REFERENCES aplicacion CONSTRAINT fk_rutas_aplicacion;
+    
+---------------------------------------------------------------------------------------------
+---------------------------------------------------------------
+-- TABLAS PARA SISTEMA DE CELULARES
+---------------------------------------------------------------
+
+-- 1. Tabla de marcas de celulares
+Select *from marcas
 CREATE TABLE marcas (
     id_marca SERIAL PRIMARY KEY,
     nombre_marca VARCHAR(100) NOT NULL UNIQUE,
@@ -114,7 +121,8 @@ CREATE TABLE marcas (
     situacion SMALLINT DEFAULT 1
 );
 
-
+-- 2. Tabla de clientes
+Select *from clientes
 CREATE TABLE clientes (
     id_cliente SERIAL PRIMARY KEY,
     nombres VARCHAR(100) NOT NULL,
@@ -128,6 +136,7 @@ CREATE TABLE clientes (
     situacion SMALLINT DEFAULT 1
 );
 
+-- 3. Tabla de celulares (inventario)
 CREATE TABLE celulares (
     id_celular SERIAL PRIMARY KEY,
     id_marca INT NOT NULL,
@@ -137,16 +146,16 @@ CREATE TABLE celulares (
     stock_actual INT DEFAULT 0,
     stock_minimo INT DEFAULT 5,
     color VARCHAR(50),
-    almacenamiento VARCHAR(20), 
-    ram VARCHAR(20), 
-    estado VARCHAR(20) DEFAULT 'Nuevo', 
+    almacenamiento VARCHAR(20), -- 64GB, 128GB, etc.
+    ram VARCHAR(20), -- 4GB, 6GB, etc.
+    estado VARCHAR(20) DEFAULT 'Nuevo', -- Nuevo, Usado, Reacondicionado
     fecha_ingreso DATE,
     fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
     situacion SMALLINT DEFAULT 1,
     FOREIGN KEY (id_marca) REFERENCES marcas(id_marca)
 );
 
-
+-- 4. Tabla de empleados
 CREATE TABLE empleados (
     id_empleado SERIAL PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -154,31 +163,31 @@ CREATE TABLE empleados (
     puesto VARCHAR(100),
     salario DECIMAL(10,2),
     fecha_ingreso DATE,
-    especialidad VARCHAR(255), 
+    especialidad VARCHAR(255), -- Reparaciones, Ventas, etc.
     fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
     situacion SMALLINT DEFAULT 1,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
+-- 5. Tabla de tipos de servicios
 CREATE TABLE tipos_servicios (
     id_tipo_servicio SERIAL PRIMARY KEY,
     descripcion VARCHAR(255) NOT NULL,
     precio_base DECIMAL(10,2) DEFAULT 0.00,
-    tiempo_estimado INT DEFAULT 0,
-    categoria VARCHAR(50), 
+    tiempo_estimado INT DEFAULT 0, -- en horas
+    categoria VARCHAR(50), -- Pantalla, Software, Hardware, etc.
     fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
     situacion SMALLINT DEFAULT 1
 );
 
-
+-- 6. Tabla de reparaciones
+DROP  TABLE reparaciones
 CREATE TABLE reparaciones (
     id_reparacion SERIAL PRIMARY KEY,
     id_cliente INT NOT NULL,
     id_empleado_asignado INT,
     id_tipo_servicio INT,
-    tipo_celular VARCHAR(100),
-    marca_celular VARCHAR(100),
-    modelo_celular VARCHAR(100),
+    id_celular INT,
     imei VARCHAR(20),
     motivo LVARCHAR(1000) NOT NULL,
     diagnostico LVARCHAR(1000),
@@ -191,16 +200,18 @@ CREATE TABLE reparaciones (
     costo_servicio DECIMAL(10,2) DEFAULT 0.00,
     costo_repuestos DECIMAL(10,2) DEFAULT 0.00,
     total_cobrado DECIMAL(10,2) DEFAULT 0.00,
-    estado VARCHAR(20) DEFAULT 'Ingresado',
-    prioridad VARCHAR(10) DEFAULT 'Normal', 
+    estado VARCHAR(20) DEFAULT 'Ingresado', -- Ingresado, Asignado, En_Proceso, Terminado, Entregado, Cancelado
+    prioridad VARCHAR(10) DEFAULT 'Normal', -- Alta, Normal, Baja
     observaciones LVARCHAR(1000),
     fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
     situacion SMALLINT DEFAULT 1,
     FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
     FOREIGN KEY (id_empleado_asignado) REFERENCES empleados(id_empleado),
-    FOREIGN KEY (id_tipo_servicio) REFERENCES tipos_servicios(id_tipo_servicio)
+    FOREIGN KEY (id_tipo_servicio) REFERENCES tipos_servicios(id_tipo_servicio),
+    FOREIGN KEY (id_celular) REFERENCES celulares(id_celular)
 );
 
+-- 7. Tabla de ventas
 CREATE TABLE ventas (
     id_venta SERIAL PRIMARY KEY,
     id_empleado_vendedor INT NOT NULL,
@@ -212,8 +223,8 @@ CREATE TABLE ventas (
     descuento DECIMAL(10,2) DEFAULT 0.00,
     impuestos DECIMAL(10,2) DEFAULT 0.00,
     total DECIMAL(10,2) NOT NULL,
-    metodo_pago VARCHAR(20) DEFAULT 'Efectivo',
-    estado_pago VARCHAR(20) DEFAULT 'Pagado',
+    metodo_pago VARCHAR(20) DEFAULT 'Efectivo', -- Efectivo, Tarjeta, Transferencia
+    estado_pago VARCHAR(20) DEFAULT 'Pagado', -- Pagado, Pendiente, Parcial
     observaciones LVARCHAR(500),
     fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
     situacion SMALLINT DEFAULT 1,
@@ -221,7 +232,7 @@ CREATE TABLE ventas (
     FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
 );
 
-
+-- 8. Tabla de detalle de ventas
 CREATE TABLE detalle_ventas (
     id_detalle SERIAL PRIMARY KEY,
     id_venta INT NOT NULL,
@@ -239,7 +250,7 @@ CREATE TABLE detalle_ventas (
     FOREIGN KEY (id_reparacion) REFERENCES reparaciones(id_reparacion)
 );
 
-
+-- 9. Tabla de movimientos de inventario
 CREATE TABLE movimientos_inventario (
     id_movimiento SERIAL PRIMARY KEY,
     id_celular INT NOT NULL,

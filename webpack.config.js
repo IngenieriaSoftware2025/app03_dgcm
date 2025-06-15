@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   mode: 'development',
   entry: {
-    // ✅ App.js debe ser el PRIMER entry point
+    // App.js debe ser el PRIMER entry point
     'js/app': './src/js/app.js',
     'js/inicio': './src/js/inicio.js',
 
@@ -33,7 +33,7 @@ module.exports = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'public/build'),
-    // ✅ Limpiar el directorio de salida en cada build
+    // Limpiar el directorio de salida en cada build
     clean: true
   },
   plugins: [
@@ -58,13 +58,13 @@ module.exports = {
         type: 'asset/resource',
       },
       {
-        // ✅ Soporte para fuentes de Bootstrap Icons
+        // Soporte para fuentes de Bootstrap Icons
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
       }
     ]
   },
-  // ✅ Configuración para desarrollo
+  // Configuración para desarrollo
   devtool: 'source-map',
   resolve: {
     extensions: ['.js', '.scss', '.css']

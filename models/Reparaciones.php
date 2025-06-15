@@ -12,9 +12,7 @@ class Reparaciones extends ActiveRecord
         'id_cliente',
         'id_empleado_asignado',
         'id_tipo_servicio',
-        'tipo_celular',
-        'marca_celular',
-        'modelo_celular',
+        'id_celular',
         'imei',
         'motivo',
         'diagnostico',
@@ -38,9 +36,7 @@ class Reparaciones extends ActiveRecord
     public $id_cliente;
     public $id_empleado_asignado;
     public $id_tipo_servicio;
-    public $tipo_celular;
-    public $marca_celular;
-    public $modelo_celular;
+    public $id_celular;
     public $imei;
     public $motivo;
     public $diagnostico;
@@ -61,29 +57,41 @@ class Reparaciones extends ActiveRecord
 
     public function __construct($args = [])
     {
-        $this->id_reparacion = $args['id_reparacion'] ?? null;
-        $this->id_cliente = $args['id_cliente'] ?? '';
-        $this->id_empleado_asignado = $args['id_empleado_asignado'] ?? null;
-        $this->id_tipo_servicio = $args['id_tipo_servicio'] ?? null;
-        $this->tipo_celular = $args['tipo_celular'] ?? '';
-        $this->marca_celular = $args['marca_celular'] ?? '';
-        $this->modelo_celular = $args['modelo_celular'] ?? '';
-        $this->imei = $args['imei'] ?? '';
-        $this->motivo = $args['motivo'] ?? '';
-        $this->diagnostico = $args['diagnostico'] ?? '';
-        $this->solucion = $args['solucion'] ?? '';
-        $this->fecha_ingreso = $args['fecha_ingreso'] ?? null;
-        $this->fecha_asignacion = $args['fecha_asignacion'] ?? null;
-        $this->fecha_inicio_trabajo = $args['fecha_inicio_trabajo'] ?? null;
-        $this->fecha_terminado = $args['fecha_terminado'] ?? null;
-        $this->fecha_entrega = $args['fecha_entrega'] ?? null;
-        $this->costo_servicio = $args['costo_servicio'] ?? 0;
-        $this->costo_repuestos = $args['costo_repuestos'] ?? 0;
-        $this->total_cobrado = $args['total_cobrado'] ?? 0;
-        $this->estado = $args['estado'] ?? 'Ingresado';
-        $this->prioridad = $args['prioridad'] ?? 'Normal';
-        $this->observaciones = $args['observaciones'] ?? '';
-        $this->fecha_creacion = $args['fecha_creacion'] ?? null;
-        $this->situacion = $args['situacion'] ?? 1;
+        $this->id_reparacion = $reparacion['id_reparacion'] ?? null;
+        $this->id_cliente = $reparacion['id_cliente'] ?? '';
+        $this->id_empleado_asignado = $reparacion['id_empleado_asignado'] ?? null;
+        $this->id_tipo_servicio = $reparacion['id_tipo_servicio'] ?? null;
+        $this->id_celular = $reparacion['id_celular'] ?? null;
+        $this->imei = $reparacion['imei'] ?? '';
+        $this->motivo = $reparacion['motivo'] ?? '';
+        $this->diagnostico = $reparacion['diagnostico'] ?? '';
+        $this->solucion = $reparacion['solucion'] ?? '';
+        $this->fecha_ingreso = $reparacion['fecha_ingreso'] ?? null;
+        $this->fecha_asignacion = $reparacion['fecha_asignacion'] ?? null;
+        $this->fecha_inicio_trabajo = $reparacion['fecha_inicio_trabajo'] ?? null;
+        $this->fecha_terminado = $reparacion['fecha_terminado'] ?? null;
+        $this->fecha_entrega = $reparacion['fecha_entrega'] ?? null;
+        $this->costo_servicio = $reparacion['costo_servicio'] ?? 0.00;
+        $this->costo_repuestos = $reparacion['costo_repuestos'] ?? 0.00;
+        $this->total_cobrado = $reparacion['total_cobrado'] ?? 0.00;
+        $this->estado = $reparacion['estado'] ?? 'Ingresado';
+        $this->prioridad = $reparacion['prioridad'] ?? 'Normal';
+        $this->observaciones = $reparacion['observaciones'] ?? '';
+        $this->fecha_creacion = $reparacion['fecha_creacion'] ?? null;
+        $this->situacion = $reparacion['situacion'] ?? 1;
+    }
+
+    public function atributos()
+    {
+        $atributos = [];
+        foreach (static::$columnasDB as $columna) {
+            $columna = strtolower($columna);
+
+            // Solo agregar si la propiedad existe y no es null
+            if (property_exists($this, $columna)) {
+                $atributos[$columna] = $this->$columna;
+            }
+        }
+        return $atributos;
     }
 }

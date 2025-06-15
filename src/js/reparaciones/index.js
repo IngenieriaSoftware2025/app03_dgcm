@@ -4,228 +4,523 @@ import DataTable from "datatables.net-bs5";
 import { validarFormulario } from "../funciones";
 import { lenguaje } from "../lenguaje";
 
-// Formulario y elementos
-const FormReparacion = document.getElementById('FormReparacion');
+const FormReparaciones = document.getElementById('FormReparaciones');
 const BtnGuardar = document.getElementById('BtnGuardar');
 const BtnModificar = document.getElementById('BtnModificar');
 const BtnLimpiar = document.getElementById('BtnLimpiar');
-const BtnVerLista = document.getElementById('BtnVerLista');
-const BtnNuevo = document.getElementById('BtnNuevo');
+
+// Botones de acción
+const BtnVerReparaciones = document.getElementById('BtnVerReparaciones');
+const BtnCrearReparacion = document.getElementById('BtnCrearReparacion');
 const BtnActualizarTabla = document.getElementById('BtnActualizarTabla');
 
+// Secciones del formulario y tabla
 const seccionFormulario = document.getElementById('seccionFormulario');
 const seccionTabla = document.getElementById('seccionTabla');
 const tituloFormulario = document.getElementById('tituloFormulario');
 
-// Inicializar DataTable
-const datosDeTabla = new DataTable('#TableReparaciones', {
-    dom: "<'row justify-content-between'<'col'l><'col'B><'col-3'f>>t<'row justify-content-between'<'col-md-3'i><'col-md-8'p>>",
-    language: lenguaje,
-    data: [],
-    columns: [
-        { title: 'N°', data: 'id_reparacion', render: (data, type, row, meta) => meta.row + 1 },
-        { title: 'Cliente', data: 'cliente_nombre' },
-        { title: 'Modelo', data: 'modelo_celular' },
-        { title: 'Motivo', data: 'motivo' },
-        { title: 'Estado', data: 'estado' },
-        { title: 'Prioridad', data: 'prioridad' },
-        {
-            title: 'Opciones', data: 'id_reparacion', render: (data, type, row) => {
-                return `
-                    <button class="btn btn-warning btn-sm modificar" data-id="${data}"><i class="bi bi-pencil-fill"></i></button>
-                    <button class="btn btn-danger btn-sm eliminar" data-id="${data}"><i class="bi bi-trash3-fill"></i></button>
-                `;
-            }
-        }
-    ]
-});
-
-// Cambiar entre formulario y tabla
+// cambiar vistas
 const mostrarFormulario = (titulo = 'Registrar Reparación') => {
     seccionFormulario.classList.remove('d-none');
     seccionTabla.classList.add('d-none');
     tituloFormulario.textContent = titulo;
+
+    // Scroll al formulario
+    seccionFormulario.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
 }
 
+// Evento para mostrar la tabla
 const mostrarTabla = () => {
     seccionFormulario.classList.add('d-none');
     seccionTabla.classList.remove('d-none');
-    buscaReparaciones();
-}
 
-// Limpiar formulario
-const limpiarFormulario = () => {
-    FormReparacion.reset();
-    document.getElementById('id_reparacion').value = '';
-    BtnGuardar.classList.remove('d-none');
-    BtnModificar.classList.add('d-none');
-    tituloFormulario.textContent = 'Registrar Reparación';
-}
+    // Actualizar datos automáticamente
+    buscaReparacion();
 
-// Cargar combos iniciales
-const cargarCombos = async () => {
-    await cargarClientes();
-    await cargarServicios();
-}
-
-const cargarClientes = async () => {
-    const respuesta = await fetch('/app03_carbajal_clase/api/clientes');
-    const datos = await respuesta.json();
-
-    const select = document.getElementById('id_cliente');
-    select.innerHTML = '<option value="">Seleccione un cliente</option>';
-
-    datos?.data?.forEach(c => {
-        select.innerHTML += `<option value="${c.id_cliente}">${c.nombres} ${c.apellidos}</option>`;
+    // Scroll a la tabla
+    seccionTabla.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
     });
 }
 
-const cargarServicios = async () => {
-    const respuesta = await fetch('/app03_carbajal_clase/api/tipos_servicios');
-    const datos = await respuesta.json();
 
-    const select = document.getElementById('id_tipo_servicio');
-    select.innerHTML = '<option value="">Seleccione un servicio</option>';
+// Inicializar DataTable
+const datosDeTabla = new DataTable('#TableReparaciones', {
+    dom: `
+        <"row mt-3 justify-content-between"
+            <"col" l>
+            <"col" B>
+            <"col-3" f>
+        >
+        t
+        <"row mt-3 justify-content-between"
+            <"col-md-3 d-flex align-items-center" i>
+            <"col-md-8 d-flex justify-content-end" p>
+        >
+    `,
+    language: lenguaje,
+    data: [],
+    columns: [
+        {
+            title: 'N°',
+            data: 'id_reparacion',
+            width: '5%',
+            render: (data, type, row, meta) => meta.row + 1
+        },
+        {
+            title: 'Cliente',
+            data: null,
+            render: (data, type, row) => {
+                return `${row.cliente_nombre} ${row.cliente_apellido || ''}`.trim();
+            }
+        },
+        { title: 'Modelo', data: 'modelo_celular' },
+        { title: 'IMEI', data: 'imei' },
+        { title: 'Motivo', data: 'motivo' },
+        { title: 'Estado', data: 'estado' },
+        { title: 'Prioridad', data: 'prioridad' },
+        {
+            title: 'Costo Total',
+            data: null,
+            render: (data, type, row) => {
+                const total = parseFloat(row.total_cobrado || 0);
+                return `Q${total.toFixed(2)}`;
+            }
+        },
+        {
+            title: 'Opciones',
+            data: 'id_reparacion',
+            searchable: false,
+            orderable: false,
+            render: (data, type, row, meta) => {
+                return `
+                <div class='d-flex justify-content-center'>
+                    <button class='btn btn-warning modificar mx-1' 
+                        data-id="${data}" 
+                        data-id_cliente="${row.id_cliente}"  
+                        data-id_empleado_asignado="${row.id_empleado_asignado || ''}"
+                        data-id_tipo_servicio="${row.id_tipo_servicio || ''}"
+                        data-id_celular="${row.id_celular}"  
+                        data-imei="${row.imei || ''}"   
+                        data-motivo="${row.motivo}"
+                        data-diagnostico="${row.diagnostico || ''}"
+                        data-solucion="${row.solucion || ''}"
+                        data-costo_servicio="${row.costo_servicio || ''}"
+                        data-costo_repuestos="${row.costo_repuestos || ''}"
+                        data-total_cobrado="${row.total_cobrado || ''}"
+                        data-estado="${row.estado}"
+                        data-prioridad="${row.prioridad}"
+                        data-observaciones="${row.observaciones || ''}">
+                        <i class='bi bi-pencil-square me-1'></i> Modificar
+                    </button>
+                    <button class='btn btn-danger eliminar mx-1' 
+                        data-id="${data}">
+                        <i class="bi bi-trash3 me-1"></i>Eliminar
+                    </button>
+                </div>
+                `;
+            }
+        },
+    ],
+});
 
-    datos?.data?.forEach(s => {
-        select.innerHTML += `<option value="${s.id_tipo_servicio}">${s.descripcion}</option>`;
-    });
-}
 
-// Guardar nueva reparación
+// Guardar reparación
 const guardaReparacion = async (e) => {
     e.preventDefault();
     BtnGuardar.disabled = true;
 
-    if (!validarFormulario(FormReparacion)) {
-        Swal.fire({ icon: 'warning', text: 'Complete todos los campos obligatorios' });
+    if (!validarFormulario(FormReparaciones, ['id_reparacion', 'id_empleado_asignado', 'id_tipo_servicio', 'diagnostico', 'solucion', 'fecha_asignacion', 'fecha_inicio_trabajo', 'fecha_terminado', 'fecha_entrega', 'costo_servicio', 'costo_repuestos', 'total_cobrado', 'observaciones'])) {
+        Swal.fire({
+            position: "center",
+            icon: "warning",
+            title: "Formulario incompleto",
+            text: "Complete los campos obligatorios",
+            showConfirmButton: false,
+            timer: 1000
+        });
         BtnGuardar.disabled = false;
         return;
     }
 
-    const body = new FormData(FormReparacion);
+    const body = new FormData(FormReparaciones);
+
     const url = '/app03_carbajal_clase/guarda_reparacion';
-
-    const respuesta = await fetch(url, { method: 'POST', body });
-    const datos = await respuesta.json();
-
-    if (datos.codigo === 1) {
-        Swal.fire({ icon: 'success', text: datos.mensaje });
-        limpiarFormulario();
-        mostrarTabla();
-    } else {
-        Swal.fire({ icon: 'error', text: datos.mensaje });
+    const config = {
+        method: 'POST',
+        body
     }
 
+    try {
+        const respuesta = await fetch(url, config);
+        const datos = await respuesta.json();
+
+        if (datos.codigo === 1) {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "¡Éxito!",
+                text: datos.mensaje,
+                showConfirmButton: false,
+                timer: 1000
+            });
+
+            limpiarFormulario();
+
+            setTimeout(async () => {
+                const resultado = await Swal.fire({
+                    title: '¿Desea ver las reparaciones registradas?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, ver reparaciones',
+                    cancelButtonText: 'Seguir registrando'
+                });
+
+                if (resultado.isConfirmed) {
+                    mostrarTabla();
+                }
+            }, 1000);
+
+        } else {
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error",
+                text: datos.mensaje,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error de conexión",
+            text: "No se pudo conectar con el servidor",
+            showConfirmButton: false,
+            timer: 1000
+        });
+    }
     BtnGuardar.disabled = false;
 }
 
-// Buscar reparaciones
-const buscaReparaciones = async () => {
-    const respuesta = await fetch('/app03_carbajal_clase/busca_reparacion');
-    const datos = await respuesta.json();
 
-    datosDeTabla.clear().draw();
-    if (datos?.data?.length) {
-        datosDeTabla.rows.add(datos.data).draw();
+// Buscar reparaciones
+const buscaReparacion = async () => {
+    const url = '/app03_carbajal_clase/busca_reparacion';
+    const config = {
+        method: 'GET'
+    }
+
+    try {
+        const respuesta = await fetch(url, config);
+
+        if (!respuesta.ok) {
+            console.error('Error HTTP:', respuesta.status, respuesta.statusText);
+            return;
+        }
+
+        const textoRespuesta = await respuesta.text();
+
+        let datos;
+        try {
+            datos = JSON.parse(textoRespuesta);
+        } catch (errorJSON) {
+            console.error('Error parseando JSON:', errorJSON);
+            console.error('Respuesta del servidor:', textoRespuesta);
+            return;
+        }
+
+        if (datos.codigo === 1) {
+            datosDeTabla.clear().draw();
+            if (datos.data && datos.data.length > 0) {
+                datosDeTabla.rows.add(datos.data).draw();
+            }
+        } else {
+            console.log('Error del servidor:', datos.mensaje);
+        }
+
+    } catch (error) {
+        console.error('Error completo:', error);
     }
 }
 
+// Llenar formulario
+const llenarFormulario = (e) => {
+    const datos = e.currentTarget.dataset;
+
+    document.getElementById('id_reparacion').value = datos.id;
+    document.getElementById('id_cliente').value = datos.id_cliente;
+    document.getElementById('id_empleado_asignado').value = datos.id_empleado_asignado;
+    document.getElementById('id_tipo_servicio').value = datos.id_tipo_servicio;
+    document.getElementById('id_celular').value = datos.id_celular;
+    document.getElementById('imei').value = datos.imei;
+    document.getElementById('motivo').value = datos.motivo;
+    document.getElementById('diagnostico').value = datos.diagnostico;
+    document.getElementById('solucion').value = datos.solucion;
+    document.getElementById('costo_servicio').value = datos.costo_servicio;
+    document.getElementById('costo_repuestos').value = datos.costo_repuestos;
+    document.getElementById('total_cobrado').value = datos.total_cobrado;
+    document.getElementById('estado').value = datos.estado;
+    document.getElementById('prioridad').value = datos.prioridad;
+    document.getElementById('observaciones').value = datos.observaciones;
+
+    BtnGuardar.classList.add('d-none');
+    BtnModificar.classList.remove('d-none');
+
+    mostrarFormulario('Modificar Reparación');
+}
+
+
+// Limpiar formulario
+const limpiarFormulario = () => {
+    FormReparaciones.reset();
+
+    // Limpiar validaciones
+    const inputs = FormReparaciones.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.classList.remove('is-valid', 'is-invalid');
+    });
+
+    BtnGuardar.classList.remove('d-none');
+    BtnModificar.classList.add('d-none');
+
+    //CAMBIAR TÍTULO CUANDO SE LIMPIE
+    tituloFormulario.textContent = 'Registrar Reparación';
+}
+
 // Modificar reparación
-const modificaReparacion = async () => {
+const modificaReparacion = async (e) => {
+    e.preventDefault();
     BtnModificar.disabled = true;
 
-    if (!validarFormulario(FormReparacion)) {
-        Swal.fire({ icon: 'warning', text: 'Complete todos los campos' });
+    if (!validarFormulario(FormReparaciones, ['id_empleado_asignado', 'id_tipo_servicio', 'diagnostico', 'solucion', 'fecha_asignacion', 'fecha_inicio_trabajo', 'fecha_terminado', 'fecha_entrega', 'costo_servicio', 'costo_repuestos', 'total_cobrado', 'observaciones'])) {
+        Swal.fire({
+            position: "center",
+            icon: "warning",
+            title: "Formulario incompleto",
+            text: "Complete los campos obligatorios",
+            showConfirmButton: false,
+            timer: 1000
+        });
         BtnModificar.disabled = false;
         return;
     }
 
-    const body = new FormData(FormReparacion);
-    const respuesta = await fetch('/app03_carbajal_clase/modifica_reparacion', {
+    const body = new FormData(FormReparaciones);
+    const url = '/app03_carbajal_clase/modifica_reparacion';
+    const config = {
         method: 'POST',
         body
-    });
-    const datos = await respuesta.json();
-
-    if (datos.codigo === 1) {
-        Swal.fire({ icon: 'success', text: datos.mensaje });
-        limpiarFormulario();
-        mostrarTabla();
-    } else {
-        Swal.fire({ icon: 'error', text: datos.mensaje });
     }
 
+    try {
+        const respuesta = await fetch(url, config);
+        const datos = await respuesta.json();
+
+        if (datos.codigo === 1) {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "¡Éxito!",
+                text: datos.mensaje
+            });
+
+            limpiarFormulario();
+            setTimeout(() => {
+                mostrarTabla();
+            }, 1000);
+
+        } else {
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error",
+                text: datos.mensaje,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
     BtnModificar.disabled = false;
 }
 
-// Llenar formulario para modificar
-const llenarFormulario = (data) => {
-    document.getElementById('id_reparacion').value = data.id_reparacion;
-    document.getElementById('id_cliente').value = data.id_cliente;
-    document.getElementById('tipo_celular').value = data.tipo_celular;
-    document.getElementById('marca_celular').value = data.marca_celular;
-    document.getElementById('modelo_celular').value = data.modelo_celular;
-    document.getElementById('imei').value = data.imei;
-    document.getElementById('id_tipo_servicio').value = data.id_tipo_servicio;
-    document.getElementById('motivo').value = data.motivo;
-
-    BtnGuardar.classList.add('d-none');
-    BtnModificar.classList.remove('d-none');
-    mostrarFormulario('Modificar Reparación');
-}
-
 // Eliminar reparación
-const eliminaReparacion = async (id) => {
-    const confirmacion = await Swal.fire({
-        icon: 'question',
-        title: '¿Eliminar?',
-        text: 'Esta reparación será eliminada',
+const eliminaReparacion = async (e) => {
+    const idReparacion = e.currentTarget.dataset.id;
+
+    const alertaConfirmaEliminar = await Swal.fire({
+        position: "center",
+        icon: "question",
+        title: "¿Estás seguro?",
+        text: "La reparación será eliminada del sistema",
+        showConfirmButton: true,
+        confirmButtonText: "Sí, eliminar",
+        confirmButtonColor: "red",
+        cancelButtonText: "Cancelar",
         showCancelButton: true
     });
 
-    if (!confirmacion.isConfirmed) return;
+    if (!alertaConfirmaEliminar.isConfirmed) return;
 
     const body = new FormData();
-    body.append('id_reparacion', id);
+    body.append('id_reparacion', idReparacion);
 
-    const respuesta = await fetch('/app03_carbajal_clase/elimina_reparacion', {
-        method: 'POST',
-        body
-    });
+    try {
+        const respuesta = await fetch('/app03_carbajal_clase/elimina_reparacion', {
+            method: 'POST',
+            body
+        });
 
-    const datos = await respuesta.json();
-    if (datos.codigo === 1) {
-        Swal.fire({ icon: 'success', text: datos.mensaje });
-        buscaReparaciones();
-    } else {
-        Swal.fire({ icon: 'error', text: datos.mensaje });
+        const datos = await respuesta.json();
+
+        if (datos.codigo === 1) {
+            await Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "¡Eliminado!",
+                text: datos.mensaje
+            });
+            buscaReparacion();
+        } else {
+            await Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error",
+                text: datos.mensaje
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+const cargarClientes = async () => {
+    try {
+        const respuesta = await fetch('/app03_carbajal_clase/busca_cliente');
+        const datos = await respuesta.json();
+
+        const select = document.getElementById('id_cliente');
+        select.innerHTML = '<option value="">Seleccione un cliente</option>';
+
+        if (datos.codigo === 1 && datos.data) {
+            datos.data.forEach(cliente => {
+                select.innerHTML += `<option value="${cliente.id_cliente}">${cliente.nombres} ${cliente.apellidos}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando clientes:', error);
     }
 }
 
+const cargarTiposServicios = async () => {
+    try {
+        const respuesta = await fetch('/app03_carbajal_clase/busca_tipo_servicio');
+        const datos = await respuesta.json();
+
+        const select = document.getElementById('id_tipo_servicio');
+        select.innerHTML = '<option value="">Seleccione un tipo de servicio</option>';
+
+        if (datos.codigo === 1 && datos.data) {
+            datos.data.forEach(servicio => {
+                select.innerHTML += `<option value="${servicio.id_tipo_servicio}">${servicio.descripcion}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando tipos de servicios:', error);
+    }
+}
+
+const cargarEmpleados = async () => {
+    try {
+        const respuesta = await fetch('/app03_carbajal_clase/busca_empleado');
+        const datos = await respuesta.json();
+
+        const select = document.getElementById('id_empleado_asignado');
+        select.innerHTML = '<option value="">Seleccione un empleado</option>';
+
+        if (datos.codigo === 1 && datos.data) {
+            datos.data.forEach(empleado => {
+                select.innerHTML += `<option value="${empleado.id_empleado}">${empleado.codigo_empleado} - ${empleado.usuario_nombre || 'Sin nombre'}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando empleados:', error);
+    }
+}
+
+const cargarCelulares = async () => {
+    try {
+        const respuesta = await fetch('/app03_carbajal_clase/busca_celular');
+        const datos = await respuesta.json();
+
+        const select = document.getElementById('id_celular');
+        select.innerHTML = '<option value="">Seleccione un celular</option>';
+
+        if (datos.codigo === 1 && datos.data) {
+            datos.data.forEach(celular => {
+                select.innerHTML += `<option value="${celular.id_celular}">${celular.modelo} - ${celular.marca_nombre || 'Sin marca'}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando celulares:', error);
+    }
+}
+
+// Cargar combos iniciales
+const cargarCombos = async () => {
+    await Promise.all([
+        cargarClientes(),
+        cargarCelulares(),
+        cargarEmpleados(),
+        cargarTiposServicios()
+    ]);
+}
+
 // Eventos
-FormReparacion.addEventListener('submit', guardaReparacion);
+FormReparaciones.addEventListener('submit', guardaReparacion);
+
+// Botones
 BtnLimpiar.addEventListener('click', limpiarFormulario);
 BtnModificar.addEventListener('click', modificaReparacion);
-BtnVerLista.addEventListener('click', mostrarTabla);
-BtnNuevo.addEventListener('click', () => { limpiarFormulario(); mostrarFormulario(); });
-BtnActualizarTabla.addEventListener('click', buscaReparaciones);
 
-datosDeTabla.on('click', '.modificar', async function () {
-    const id = this.dataset.id;
-    const respuesta = await fetch(`/app03_carbajal_clase/get_reparacion?id=${id}`);
-    const datos = await respuesta.json();
-    if (datos.codigo === 1) {
-        llenarFormulario(datos.data);
-    }
+// datosDeTabla
+datosDeTabla.on('click', '.modificar', llenarFormulario);
+datosDeTabla.on('click', '.eliminar', eliminaReparacion);
+
+// Eventos de botones de acción
+BtnVerReparaciones.addEventListener('click', () => {
+    mostrarTabla();
 });
 
-datosDeTabla.on('click', '.eliminar', function () {
-    eliminaReparacion(this.dataset.id);
+BtnCrearReparacion.addEventListener('click', () => {
+    limpiarFormulario();
+    mostrarFormulario('Registrar Reparación');
 });
 
-// Inicialización
+BtnActualizarTabla.addEventListener('click', () => {
+    buscaReparacion();
+    Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Tabla actualizada",
+        showConfirmButton: false,
+        timer: 1000
+    });
+});
+
+// Inicializar al cargar la página
 document.addEventListener('DOMContentLoaded', async () => {
     await cargarCombos();
-    mostrarFormulario();
+    mostrarFormulario('Registrar Reparación');
 });
