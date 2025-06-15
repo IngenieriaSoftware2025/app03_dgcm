@@ -17,6 +17,7 @@ class HistorialAct extends ActiveRecord
         'id_ruta',
         'fecha_creacion',
         'ejecucion',
+        'status',
         'situacion'
     ];
 
@@ -26,6 +27,7 @@ class HistorialAct extends ActiveRecord
     public $id_ruta;
     public $fecha_creacion;
     public $ejecucion;
+    public $status;
     public $situacion;
 
     public function __construct($historial = [])
@@ -35,6 +37,7 @@ class HistorialAct extends ActiveRecord
         $this->id_ruta = $historial['id_ruta'] ?? '';
         $this->fecha_creacion = $historial['fecha_creacion'] ?? null;
         $this->ejecucion = $historial['ejecucion'] ?? '';
+        $this->status = $historial['status'];
         $this->situacion = $historial['situacion'] ?? 1;
     }
 }

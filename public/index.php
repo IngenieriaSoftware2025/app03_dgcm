@@ -6,13 +6,25 @@ use MVC\Router;
 use Controllers\AppController;
 
 // Importa mis clases de Controladores
-use Controllers\ClienteController;
+use Controllers\ClientesController;
 use Controllers\LoginController;
 use Controllers\RegistroController;
 use Controllers\AplicacionController;
 use Controllers\PermisoController;
 use Controllers\AsigPermisosController;
 use Controllers\PermisoAplicacionController;
+
+
+use Controllers\MapaController;
+use Controllers\EstadisticasController;
+use Controllers\MarcasController;
+use Controllers\CelularesController;
+use Controllers\EmpleadosController;
+use Controllers\TiposServiciosController;
+use Controllers\ReparacionesController;
+use Controllers\VentasController;
+use Controllers\DetalleVentasController;
+use Controllers\MovimientosInventarioController;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
@@ -27,17 +39,11 @@ $router->get('/logout', [LoginController::class, 'logout']);
 
 
 // Get en nuestro idioma significa obtener, osea obtiene la vista de la pagina y la muestra al cliente
-$router->get('/clientes', [ClienteController::class, 'mostrarPagina']);
-$router->get('/busca_cliente', [ClienteController::class, 'buscaCliente']);
-$router->post('/elimina_cliente', [ClienteController::class, 'eliminaCliente']);
-$router->post('/guarda_cliente', [ClienteController::class, 'guardarCliente']);
-$router->post('/modifica_cliente', [ClienteController::class, 'modificaCliente']);
-
-// Rutas para Login
-// $router->get('/login', [LoginController::class, 'mostrarLogin']);
-// $router->post('/login', [LoginController::class, 'procesarLogin']);
-// $router->get('/logout', [LoginController::class, 'logout']);
-// $router->get('/verificar_sesion', [LoginController::class, 'verificarSesion']);
+$router->get('/clientes', [ClientesController::class, 'mostrarClientes']);
+$router->get('/busca_cliente', [ClientesController::class, 'buscarClientes']);
+$router->post('/elimina_cliente', [ClientesController::class, 'eliminarCliente']);
+$router->post('/guarda_cliente', [ClientesController::class, 'guardarCliente']);
+$router->post('/modifica_cliente', [ClientesController::class, 'modificarCliente']);
 
 // Rutas para el registro de usuario
 $router->get('/registro', [RegistroController::class, 'mostrarPaginaRegistro']);
@@ -72,6 +78,72 @@ $router->get('/busca_asig_permiso', [AsigPermisosController::class, 'buscarAsign
 $router->post('/guarda_asig_permiso', [AsigPermisosController::class, 'guardarAsignacion']);
 $router->post('/modifica_asig_permiso', [AsigPermisosController::class, 'modificarAsignacion']);
 $router->post('/elimina_asig_permiso', [AsigPermisosController::class, 'eliminarAsignacion']);
+
+
+
+// Rutas para Marcas
+$router->get('/marcas', [MarcasController::class, 'mostrarMarcas']);
+$router->post('/guarda_marca', [MarcasController::class, 'guardarMarca']);
+$router->get('/busca_marca', [MarcasController::class, 'buscarMarcas']);
+$router->post('/modifica_marca', [MarcasController::class, 'modificarMarca']);
+$router->post('/elimina_marca', [MarcasController::class, 'eliminarMarca']);
+
+// Rutas para Celulares
+$router->get('/celulares', [CelularesController::class, 'mostrarCelulares']);
+$router->post('/guarda_celular', [CelularesController::class, 'guardarCelular']);
+$router->get('/busca_celular', [CelularesController::class, 'buscarCelulares']);
+$router->post('/modifica_celular', [CelularesController::class, 'modificarCelular']);
+$router->post('/elimina_celular', [CelularesController::class, 'eliminarCelular']);
+
+// Rutas para Empleados
+$router->get('/empleados', [EmpleadosController::class, 'mostrarEmpleados']);
+$router->post('/guarda_empleado', [EmpleadosController::class, 'guardarEmpleado']);
+$router->get('/busca_empleado', [EmpleadosController::class, 'buscarEmpleados']);
+$router->post('/modifica_empleado', [EmpleadosController::class, 'modificarEmpleado']);
+$router->post('/elimina_empleado', [EmpleadosController::class, 'eliminarEmpleado']);
+
+// Rutas para TiposServicios
+$router->get('/tipos_servicios', [TiposServiciosController::class, 'mostrarTiposServicios']);
+$router->post('/guarda_tipo_servicio', [TiposServiciosController::class, 'guardarTipoServicio']);
+$router->get('/busca_tipo_servicio', [TiposServiciosController::class, 'buscarTiposServicios']);
+$router->post('/modifica_tipo_servicio', [TiposServiciosController::class, 'modificarTipoServicio']);
+$router->post('/elimina_tipo_servicio', [TiposServiciosController::class, 'eliminarTipoServicio']);
+
+// Rutas para Reparaciones
+$router->get('/reparaciones', [ReparacionesController::class, 'mostrarReparaciones']);
+$router->post('/guarda_reparacion', [ReparacionesController::class, 'guardarReparacion']);
+$router->get('/busca_reparacion', [ReparacionesController::class, 'buscarReparaciones']);
+$router->post('/modifica_reparacion', [ReparacionesController::class, 'modificarReparacion']);
+$router->post('/elimina_reparacion', [ReparacionesController::class, 'eliminarReparacion']);
+
+// Rutas para Ventas
+$router->get('/ventas', [VentasController::class, 'mostrarVentas']);
+$router->post('/guarda_venta', [VentasController::class, 'guardarVenta']);
+$router->get('/busca_venta', [VentasController::class, 'buscarVentas']);
+$router->post('/modifica_venta', [VentasController::class, 'modificarVenta']);
+$router->post('/elimina_venta', [VentasController::class, 'eliminarVenta']);
+
+// Rutas para DetalleVentas
+$router->get('/detalle_ventas', [DetalleVentasController::class, 'mostrarDetalles']);
+$router->post('/guarda_detalle_venta', [DetalleVentasController::class, 'guardarDetalle']);
+$router->get('/busca_detalle_venta', [DetalleVentasController::class, 'buscarDetalles']);
+$router->post('/modifica_detalle_venta', [DetalleVentasController::class, 'modificarDetalle']);
+$router->post('/elimina_detalle_venta', [DetalleVentasController::class, 'eliminarDetalle']);
+
+// Rutas para MovimientosInventario
+$router->get('/movimientos_inventario', [MovimientosInventarioController::class, 'mostrarMovimientos']);
+$router->post('/guarda_movimiento_inventario', [MovimientosInventarioController::class, 'guardarMovimiento']);
+$router->get('/busca_movimiento_inventario', [MovimientosInventarioController::class, 'buscarMovimientos']);
+$router->post('/modifica_movimiento_inventario', [MovimientosInventarioController::class, 'modificarMovimiento']);
+$router->post('/elimina_movimiento_inventario', [MovimientosInventarioController::class, 'eliminarMovimiento']);
+
+// Rutas para el Mapa
+$router->get('/mapa', [MapaController::class, 'renderizarMapa']);
+
+// Rutas para Estadísticas
+$router->get('/estadisticas', [EstadisticasController::class, 'index']);
+$router->get('/estadisticas/obtenerDetalleEstadistica', [EstadisticasController::class, 'obtenerDatos']);
+
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
 $router->comprobarRutas();

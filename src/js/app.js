@@ -1,40 +1,71 @@
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
 import '../scss/app.scss';
 
-document.addEventListener('DOMContentLoaded', (e) => {
-    const dropdown = document.querySelector('.dropdown-menu');
-    dropdown.style.margin = 0;
+// 1️⃣ Inicialización global de Bootstrap (queda como global para el DOM dinámico)
+window.bootstrap = bootstrap;
 
-
-    let items = document.querySelectorAll('.nav-link')
-    items.forEach(item => {
-        if (item.href == location.href) {
-            item.classList.add('active')
-            if (item.classList.contains('dropdown-item')) {
-                item.parentElement.parentElement.previousElementSibling.classList.add('active')
-            }
+// 2️⃣ Inicializar todos los dropdowns de forma automática y reutilizable
+function initializeDropdowns() {
+    const dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+    dropdownElements.forEach(el => {
+        if (!bootstrap.Dropdown.getInstance(el)) {
+            new bootstrap.Dropdown(el);
         }
     });
+}
 
+// 3️⃣ Marcar los links activos en la navegación
+function highlightActiveLinks() {
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.nav-link, .dropdown-item').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+            const dropdownToggle = link.closest('.dropdown')?.querySelector('.dropdown-toggle');
+            dropdownToggle?.classList.add('active');
+        }
+    });
+}
 
-})
+// 4️⃣ Sidebar toggle (para móviles)
+window.toggleSidebar = () => {
+    document.getElementById('sidebar')?.classList.toggle('active');
+};
 
+// 5️⃣ Lógica de inicialización
+function fullInitialization() {
+    initializeDropdowns();
+    highlightActiveLinks();
+}
 
+// 6️⃣ Inicialización en múltiples eventos para robustez
+document.addEventListener('DOMContentLoaded', fullInitialization);
+window.addEventListener('load', fullInitialization);
+setTimeout(fullInitialization, 100);
 
+// 7️⃣ Observer para DOM dinámico (por si agregas contenido con JS)
+const observer = new MutationObserver(() => {
+    initializeDropdowns();
+});
+observer.observe(document.body, { childList: true, subtree: true });
+
+// 8️⃣ Progress bar
 document.onreadystatechange = () => {
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.querySelector('.progress-bar-custom');
+    if (!progressBar || !progressContainer) return;
+
     switch (document.readyState) {
         case "loading":
-
+            progressBar.style.width = '0%';
+            progressContainer.style.display = 'block';
             break;
         case "interactive":
-            document.getElementById('bar') ? document.getElementById('bar').style.width = '35%' : null;
+            progressBar.style.width = '35%';
             break;
-
         case "complete":
-            document.getElementById('bar') ? document.getElementById('bar').style.width = '100%' : null;
-            setTimeout(() => {
-                document.getElementById('bar') ? document.getElementById('bar').parentElement.style.display = 'none' : null
-            }, 1000);
+            progressBar.style.width = '100%';
+            setTimeout(() => { progressContainer.style.display = 'none'; }, 1000);
             break;
     }
-}
+};

@@ -72,3 +72,186 @@ ALTER TABLE asig_permisos
 ALTER TABLE asig_permisos 
     ADD CONSTRAINT FOREIGN KEY (id_permiso_app) 
     REFERENCES permiso_aplicacion CONSTRAINT fk_permisos_asig;
+
+
+CREATE TABLE rutas (
+    id_ruta SERIAL PRIMARY KEY,
+    id_app INT,
+    descripcion LVARCHAR(2056),
+    situacion SMALLINT  DEFAULT 1
+);
+
+ALTER TABLE rutas 
+    ADD CONSTRAINT FOREIGN KEY (id_app) 
+    REFERENCES aplicacion CONSTRAINT fk_rutas_aplicacion;
+
+
+
+CREATE TABLE historial_act (
+    id_hist_act SERIAL PRIMARY KEY,
+    id_usuario INT,
+    id_ruta INT,
+    fecha_creacion DATETIME YEAR TO MINUTE,
+    ejecucion LVARCHAR(2056),
+    status SMALLINT,
+    situacion SMALLINT  DEFAULT 1
+);
+
+
+ALTER TABLE historial_act 
+    ADD CONSTRAINT FOREIGN KEY (id_usuario) 
+    REFERENCES usuarios CONSTRAINT fk_historial_usuarios;
+    
+ALTER TABLE historial_act 
+    ADD CONSTRAINT FOREIGN KEY (id_ruta) 
+    REFERENCES rutas CONSTRAINT fk_historial_rutas;
+
+CREATE TABLE marcas (
+    id_marca SERIAL PRIMARY KEY,
+    nombre_marca VARCHAR(100) NOT NULL UNIQUE,
+    pais_origen VARCHAR(50),
+    fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1
+);
+
+
+CREATE TABLE clientes (
+    id_cliente SERIAL PRIMARY KEY,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20),
+    celular VARCHAR(20),
+    nit VARCHAR(20),
+    correo VARCHAR(100),
+    direccion LVARCHAR(500),
+    fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1
+);
+
+CREATE TABLE celulares (
+    id_celular SERIAL PRIMARY KEY,
+    id_marca INT NOT NULL,
+    modelo VARCHAR(100) NOT NULL,
+    precio_compra DECIMAL(10,2) NOT NULL,
+    precio_venta DECIMAL(10,2) NOT NULL,
+    stock_actual INT DEFAULT 0,
+    stock_minimo INT DEFAULT 5,
+    color VARCHAR(50),
+    almacenamiento VARCHAR(20), 
+    ram VARCHAR(20), 
+    estado VARCHAR(20) DEFAULT 'Nuevo', 
+    fecha_ingreso DATE,
+    fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1,
+    FOREIGN KEY (id_marca) REFERENCES marcas(id_marca)
+);
+
+
+CREATE TABLE empleados (
+    id_empleado SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    codigo_empleado VARCHAR(20) UNIQUE NOT NULL,
+    puesto VARCHAR(100),
+    salario DECIMAL(10,2),
+    fecha_ingreso DATE,
+    especialidad VARCHAR(255), 
+    fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE tipos_servicios (
+    id_tipo_servicio SERIAL PRIMARY KEY,
+    descripcion VARCHAR(255) NOT NULL,
+    precio_base DECIMAL(10,2) DEFAULT 0.00,
+    tiempo_estimado INT DEFAULT 0,
+    categoria VARCHAR(50), 
+    fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1
+);
+
+
+CREATE TABLE reparaciones (
+    id_reparacion SERIAL PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    id_empleado_asignado INT,
+    id_tipo_servicio INT,
+    tipo_celular VARCHAR(100),
+    marca_celular VARCHAR(100),
+    modelo_celular VARCHAR(100),
+    imei VARCHAR(20),
+    motivo LVARCHAR(1000) NOT NULL,
+    diagnostico LVARCHAR(1000),
+    solucion LVARCHAR(1000),
+    fecha_ingreso DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    fecha_asignacion DATETIME YEAR TO SECOND,
+    fecha_inicio_trabajo DATETIME YEAR TO SECOND,
+    fecha_terminado DATETIME YEAR TO SECOND,
+    fecha_entrega DATETIME YEAR TO SECOND,
+    costo_servicio DECIMAL(10,2) DEFAULT 0.00,
+    costo_repuestos DECIMAL(10,2) DEFAULT 0.00,
+    total_cobrado DECIMAL(10,2) DEFAULT 0.00,
+    estado VARCHAR(20) DEFAULT 'Ingresado',
+    prioridad VARCHAR(10) DEFAULT 'Normal', 
+    observaciones LVARCHAR(1000),
+    fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
+    FOREIGN KEY (id_empleado_asignado) REFERENCES empleados(id_empleado),
+    FOREIGN KEY (id_tipo_servicio) REFERENCES tipos_servicios(id_tipo_servicio)
+);
+
+CREATE TABLE ventas (
+    id_venta SERIAL PRIMARY KEY,
+    id_empleado_vendedor INT NOT NULL,
+    id_cliente INT NOT NULL,
+    numero_factura VARCHAR(50) UNIQUE,
+    fecha_venta DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    tipo_venta CHAR(1) NOT NULL, -- C=Celular, R=Reparación, M=Mixta
+    subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    descuento DECIMAL(10,2) DEFAULT 0.00,
+    impuestos DECIMAL(10,2) DEFAULT 0.00,
+    total DECIMAL(10,2) NOT NULL,
+    metodo_pago VARCHAR(20) DEFAULT 'Efectivo',
+    estado_pago VARCHAR(20) DEFAULT 'Pagado',
+    observaciones LVARCHAR(500),
+    fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1,
+    FOREIGN KEY (id_empleado_vendedor) REFERENCES empleados(id_empleado),
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+);
+
+
+CREATE TABLE detalle_ventas (
+    id_detalle SERIAL PRIMARY KEY,
+    id_venta INT NOT NULL,
+    id_celular INT,
+    id_reparacion INT,
+    descripcion VARCHAR(255) NOT NULL,
+    cantidad INT DEFAULT 1,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    descuento_item DECIMAL(10,2) DEFAULT 0.00,
+    subtotal_item DECIMAL(10,2) NOT NULL,
+    fecha_creacion DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1,
+    FOREIGN KEY (id_venta) REFERENCES ventas(id_venta),
+    FOREIGN KEY (id_celular) REFERENCES celulares(id_celular),
+    FOREIGN KEY (id_reparacion) REFERENCES reparaciones(id_reparacion)
+);
+
+
+CREATE TABLE movimientos_inventario (
+    id_movimiento SERIAL PRIMARY KEY,
+    id_celular INT NOT NULL,
+    id_empleado INT NOT NULL,
+    tipo_movimiento VARCHAR(20) NOT NULL, -- Entrada, Salida, Ajuste, Venta
+    cantidad INT NOT NULL,
+    stock_anterior INT NOT NULL,
+    stock_nuevo INT NOT NULL,
+    motivo LVARCHAR(500),
+    referencia VARCHAR(100), -- Número de venta, compra, etc.
+    fecha_movimiento DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+    situacion SMALLINT DEFAULT 1,
+    FOREIGN KEY (id_celular) REFERENCES celulares(id_celular),
+    FOREIGN KEY (id_empleado) REFERENCES empleados(id_empleado)
+);

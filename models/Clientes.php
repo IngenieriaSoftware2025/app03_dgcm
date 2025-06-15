@@ -1,45 +1,47 @@
 <?php
 
-// crea nombre de espacio Model
 namespace Model;
 
-// Importa la clase ActiveRecord del nombre de espacio Model
 use Model\ActiveRecord;
 
-// Crea la clase de instancia Clientes y hereda las funciones de ActiveRecord
 class Clientes extends ActiveRecord
 {
-
-    // Crea las propiedades de la clase
     public static $tabla = 'clientes';
     public static $idTabla = ['id_cliente'];
-    public static $columnasDB =
-    [
+    public static $columnasDB = [
         'nombres',
         'apellidos',
         'telefono',
-        'sar',
+        'celular',
+        'nit',
         'correo',
+        'direccion',
+        'fecha_creacion',
         'situacion'
     ];
 
-    // Crea las variables para almacenar los datos
     public $id_cliente;
     public $nombres;
     public $apellidos;
     public $telefono;
-    public $sar;
+    public $celular;
+    public $nit;
     public $correo;
+    public $direccion;
+    public $fecha_creacion;
     public $situacion;
 
-    public function __construct($cliente = [])
+    public function __construct($args = [])
     {
-        $this->id_cliente = $cliente['id_cliente'] ?? null;
-        $this->nombres = $cliente['nombres'] ?? '';
-        $this->apellidos = $cliente['apellidos'] ?? '';
-        $this->telefono = $cliente['telefono'] ?? '';
-        $this->sar = $cliente['sar'] ?? '';
-        $this->correo = $cliente['correo'] ?? '';
-        $this->situacion = $cliente['situacion'] ?? 1;
+        $this->id_cliente = $args['id_cliente'] ?? null;
+        $this->nombres = $args['nombres'] ?? '';
+        $this->apellidos = $args['apellidos'] ?? '';
+        $this->telefono = $args['telefono'] ?? '';
+        $this->celular = $args['celular'] ?? '';
+        $this->nit = $args['nit'] ?? '';
+        $this->correo = $args['correo'] ?? '';
+        $this->direccion = $args['direccion'] ?? '';
+        $this->fecha_creacion = $args['fecha_creacion'] ?? null;
+        $this->situacion = $args['situacion'] ?? 1;
     }
 }

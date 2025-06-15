@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="build/js/app.js"></script>
     <link rel="shortcut icon" href="<?= asset('images/cit.png') ?>" type="image/x-icon">
     <link rel="stylesheet" href="<?= asset('build/styles.css') ?>">
     <title>Sistema de Gestión</title>
@@ -53,13 +52,25 @@
         </div>
 
         <!-- Navigation -->
-        <!-- Navigation -->
         <div class="nav-items">
             <div class="nav-item">
                 <a class="nav-link <?= ($pagina == 'inicio') ? 'active' : '' ?>" href="/app03_carbajal_clase" data-tooltip="Inicio">
                     <i class="bi bi-house-fill"></i>
                     <span>Inicio</span>
                 </a>
+            </div>
+
+            <!-- Dropdown de Tienda -->
+            <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    <i class="bi bi-shop"></i>
+                    <span>Tienda</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/app03_carbajal_clase/celulares">Celulares</a></li>
+                    <li><a class="dropdown-item" href="/app03_carbajal_clase/marcas">Marcas</a></li>
+                    <li><a class="dropdown-item" href="/app03_carbajal_clase/reparaciones">Reparaciones</a></li>
+                </ul>
             </div>
 
             <div class="nav-item">
@@ -83,19 +94,37 @@
                 </a>
             </div>
 
-            <div class="nav-item dropdown" id="opcionesDropdown">
-                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-tooltip="Configuración">
+            <div class="nav-item">
+                <a class="nav-link" href="/app03_carbajal_clase/clientes" data-tooltip="Clientes">
+                    <i class="bi bi-person-lines-fill"></i>
+                    <span>Clientes</span>
+                </a>
+            </div>
+
+            <div class="nav-item">
+                <a class="nav-link" href="/app03_carbajal_clase/mapa" data-tooltip="Mapa">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>Mapa</span>
+                </a>
+            </div>
+
+            <div class="nav-item">
+                <a class="nav-link" href="/app03_carbajal_clase/graficas" data-tooltip="Gráficas">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Gráficas</span>
+                </a>
+            </div>
+
+            <!-- Dropdown de Configuración -->
+            <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                     <i class="bi bi-gear"></i>
                     <span>Configuración</span>
                 </a>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/app03_carbajal_clase/permiso_aplicacion">
-                        Asignar Permisos a Apps
-                    </a>
-                    <a class="dropdown-item" href="/app03_carbajal_clase/asignacion_permisos">
-                        Asignar Permisos a Usuarios
-                    </a>
-                </div>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/app03_carbajal_clase/permiso_aplicacion">Asignar Permisos a Apps</a></li>
+                    <li><a class="dropdown-item" href="/app03_carbajal_clase/asignacion_permisos">Asignar Permisos a Usuarios</a></li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -111,6 +140,44 @@
     <div class="progress-bar-custom">
         <div class="progress-fill" id="progressBar"></div>
     </div>
+
+    <script src="<?= asset('build/js/app.js') ?>"></script>
+
+    <!-- Agrega esto AL FINAL de layout.php si app.js no carga -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Inicializar todos los dropdowns
+            const dropdownElementList = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+            const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl));
+
+            // Función para el toggle del sidebar
+            window.toggleSidebar = function() {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    sidebar.classList.toggle('active');
+                }
+            };
+
+            // Marcar enlaces activos
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link, .dropdown-item');
+
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+
+                    if (link.classList.contains('dropdown-item')) {
+                        const dropdownToggle = link.closest('.dropdown').querySelector('.dropdown-toggle');
+                        if (dropdownToggle) {
+                            dropdownToggle.classList.add('active');
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
