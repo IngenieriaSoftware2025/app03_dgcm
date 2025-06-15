@@ -5,6 +5,7 @@ import { validarFormulario } from "../funciones";
 import { lenguaje } from "../lenguaje";
 
 const FormMarca = document.getElementById('FormMarca');
+
 const BtnGuardar = document.getElementById('BtnGuardar');
 const BtnModificar = document.getElementById('BtnModificar');
 const BtnLimpiar = document.getElementById('BtnLimpiar');
@@ -54,7 +55,7 @@ const guardaMarca = async (e) => {
     e.preventDefault();
     BtnGuardar.disabled = true;
 
-    // Validar formulario (puedes incluir más campos requeridos si es necesario)
+    // Validar formulario
     if (!validarFormulario(FormMarca, ['nombre_marca'])) {
         Swal.fire({
             position: "center",
