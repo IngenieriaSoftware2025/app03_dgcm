@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -7,100 +7,109 @@
     <script src="build/js/app.js"></script>
     <link rel="shortcut icon" href="<?= asset('images/cit.png') ?>" type="image/x-icon">
     <link rel="stylesheet" href="<?= asset('build/styles.css') ?>">
-    <title>DemoApp</title>
+    <title>Sistema de Gestión</title>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark  bg-dark">
+    <!-- Mobile Toggle -->
+    <button class="mobile-toggle" onclick="toggleSidebar()">
+        <i class="bi bi-list"></i>
+    </button>
 
-        <div class="container-fluid">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <img src="<?= asset('./images/cit.png') ?>" alt="CIT">
+            <h5>Sistema</h5>
+        </div>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <a class="navbar-brand" href="/ejemplo/">
-                <img src="<?= asset('./images/cit.png') ?>" width="35px'" alt="cit">
-                Aplicaciones
-            </a>
-            <div class="collapse navbar-collapse" id="navbarToggler">
+        <!-- User Section -->
+        <div class="user-section">
+            <?php session_start(); ?>
+            <?php if (isset($_SESSION['user'])): ?>
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="user-btn dropdown-toggle" data-bs-toggle="dropdown">
+                        <div class="user-avatar">
+                            <?= strtoupper(substr($_SESSION['user'], 0, 1)) ?>
+                        </div>
+                        <span class="flex-grow-1 text-start"><?= $_SESSION['user'] ?></span>
+                    </button>
 
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="margin: 0;">
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/app03_carbajal_clase"><i class="bi bi-house-fill me-2"></i>Inicio</a>
-                    </li>
-
-                    <div class="nav-item dropdown ">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-gear me-2"></i>Opciones
+                    <div class="dropdown-menu mt-2">
+                        <div class="dropdown-header" style="padding: 8px 12px; font-size: 12px; color: #666; border-bottom: 1px solid #e0e0e0;">
+                            Sesión Activa
+                        </div>
+                        <a class="dropdown-item" href="/app03_carbajal_clase/logout" style="color: #e60023; padding: 8px 12px;">
+                            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
                         </a>
-                        <ul class="dropdown-menu  dropdown-menu-dark " id="dropwdownRevision" style="margin: 0;">
-                            <!-- <h6 class="dropdown-header">Información</h6> -->
-                            <li>
-                                <a class="dropdown-item nav-link text-white " href="/app03_carbajal_clase/aplicaciones"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a aplicaciones</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-white " href="/app03_carbajal_clase/permisos"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Ir a permisos</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-white " href="/app03_carbajal_clase/permiso_aplicacion"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Asignar permisos a aplicaciones</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link text-white " href="/app03_carbajal_clase/asignacion_permisos"><i class="ms-lg-0 ms-2 bi bi-plus-circle me-2"></i>Asignar perimisos a usuarios</a>
-                            </li>
-
-                        </ul>
                     </div>
-
-                </ul>
-
-                <?php session_start(); ?>
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle me-1 text-white"></i>
-                        <?= isset($_SESSION['user']) ? $_SESSION['user'] : 'Iniciar Sesión' ?>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" id="dropdownUsuario">
-                        <?php if (isset($_SESSION['user'])): ?>
-                            <li>
-                                <a class="dropdown-item" href="/app03_carbajal_clase/logout">
-                                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-                                </a>
-                            </li>
-                        <?php else: ?>
-                            <li>
-                                <a class="dropdown-item" href="/app03_carbajal_clase/login">
-                                    <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/app03_carbajal_clase/registro">
-                                    <i class="bi bi-box-arrow-in-right me-2"></i>Registrar usuario
-                                </a>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
                 </div>
-
-
-            </div>
+            <?php else: ?>
+                <a href="/app03_carbajal_clase/login" class="btn btn-primary w-100">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                </a>
+            <?php endif; ?>
         </div>
 
+        <!-- Navigation -->
+        <!-- Navigation -->
+        <div class="nav-items">
+            <div class="nav-item">
+                <a class="nav-link <?= ($pagina == 'inicio') ? 'active' : '' ?>" href="/app03_carbajal_clase" data-tooltip="Inicio">
+                    <i class="bi bi-house-fill"></i>
+                    <span>Inicio</span>
+                </a>
+            </div>
+
+            <div class="nav-item">
+                <a class="nav-link" href="/app03_carbajal_clase/aplicaciones" data-tooltip="Aplicaciones">
+                    <i class="bi bi-app-indicator"></i>
+                    <span>Aplicaciones</span>
+                </a>
+            </div>
+
+            <div class="nav-item">
+                <a class="nav-link" href="/app03_carbajal_clase/permisos" data-tooltip="Permisos">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>Permisos</span>
+                </a>
+            </div>
+
+            <div class="nav-item">
+                <a class="nav-link" href="/app03_carbajal_clase/registro" data-tooltip="Usuarios">
+                    <i class="bi bi-people"></i>
+                    <span>Usuarios</span>
+                </a>
+            </div>
+
+            <div class="nav-item dropdown" id="opcionesDropdown">
+                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-tooltip="Configuración">
+                    <i class="bi bi-gear"></i>
+                    <span>Configuración</span>
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/app03_carbajal_clase/permiso_aplicacion">
+                        Asignar Permisos a Apps
+                    </a>
+                    <a class="dropdown-item" href="/app03_carbajal_clase/asignacion_permisos">
+                        Asignar Permisos a Usuarios
+                    </a>
+                </div>
+            </div>
+        </div>
     </nav>
-    <div class="progress fixed-bottom" style="height: 6px;">
-        <div class="progress-bar progress-bar-animated bg-danger" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
-    <div class="container-fluid pt-5 mb-4" style="min-height: 85vh">
 
-        <?php echo $contenido; ?>
-    </div>
-    <div class="container-fluid ">
-        <div class="row justify-content-center text-center">
-            <div class="col-12">
-                <p style="font-size:xx-small; font-weight: bold;">
-                    Comando de Informática y Tecnología, <?= date('Y') ?> &copy;
-                </p>
-            </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-area">
+            <?php echo $contenido; ?>
         </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-custom">
+        <div class="progress-fill" id="progressBar"></div>
     </div>
 </body>
 

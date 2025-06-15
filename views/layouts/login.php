@@ -11,27 +11,25 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background:#ffffff; border-bottom:1px solid #e0e0e0;">
         <div class="container-fluid">
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <a class="navbar-brand" href="/app03_carbajal_clase/">
-                <img src="<?= asset('./images/cit.png') ?>" width="35px" alt="cit">
-                Sistema de Celulares
+            <a class="navbar-brand d-flex align-items-center" href="/app03_carbajal_clase/">
+                <img src="<?= asset('./images/cit.png') ?>" width="35" alt="cit" class="me-2">
+                <span>Sistema de Celulares</span>
             </a>
 
             <div class="collapse navbar-collapse" id="navbarToggler">
                 <ul class="navbar-nav ms-auto">
-                    <!-- Botón de ayuda -->
                     <li class="nav-item">
-                        <button type="button" id="mostrarAyuda" class="btn btn-outline-light btn-sm me-2">
+                        <button type="button" id="mostrarAyuda" class="btn btn-outline-dark btn-sm me-2">
                             <i class="bi bi-question-circle"></i> Ayuda
                         </button>
                     </li>
-
                 </ul>
             </div>
 
@@ -39,14 +37,14 @@
     </nav>
 
     <div class="progress fixed-bottom" style="height: 6px;">
-        <div class="progress-bar progress-bar-animated bg-primary" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="progress-bar progress-bar-animated" style="background: #e60023;" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
 
-    <div class="container-fluid pt-5 mb-4" style="min-height: 85vh">
+    <div class="container-fluid py-5 mb-4" style="min-height: 85vh">
         <?php echo $contenido; ?>
     </div>
 
-    <div class="container-fluid">
+    <div class="container-fluid border-top py-3 bg-light">
         <div class="row justify-content-center text-center">
             <div class="col-12">
                 <p style="font-size:xx-small; font-weight: bold;">
